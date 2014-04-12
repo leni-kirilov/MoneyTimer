@@ -1,9 +1,8 @@
 package bg.kirilov.timer;
 
-import java.awt.AWTEvent;
+import javax.swing.*;
+import java.awt.*;
 import java.text.NumberFormat;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /**
  * JPanel that contains a clock that measures the time and calculates
@@ -260,6 +259,7 @@ public class TickingPanel extends javax.swing.JPanel {
         amountLabel.setText("0.00");
     }
 
+    //TODO rework UI - split to UI and presenter
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is

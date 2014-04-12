@@ -1,7 +1,7 @@
 package bg.kirilov.timer;
 
+import javax.swing.*;
 import java.text.NumberFormat;
-import javax.swing.JLabel;
 
 /**
  * A class revealing functionality for starting, stopping, pausing a clock.<br>
@@ -13,6 +13,8 @@ import javax.swing.JLabel;
  * @author Leni Kirilov
  * @version 2010-February
  */
+
+//TODO split this class into 2 - 1 for ticking and another one for updating UI when ticks are applied
 public class TickingThread extends Thread {
 
     /**
@@ -55,13 +57,6 @@ public class TickingThread extends Thread {
      * Used to concatenate strings faster.
      */
     private StringBuilder stringBuilder = new StringBuilder(1);
-
-    /**
-     * Added constructor just for the purpose of inheritance
-     */
-    protected TickingThread() {
-        this(new TickingPanel());
-    }
 
     protected TickingThread(TickingPanel panel) {
         this.clockLabel = panel.getClockLabel();
@@ -174,6 +169,7 @@ public class TickingThread extends Thread {
         updateAmount();
     }
 
+    //TODO extract computed values from magic numbers
     /**
      * Updates the clock
      */
