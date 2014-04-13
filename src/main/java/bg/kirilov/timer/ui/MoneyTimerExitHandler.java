@@ -1,7 +1,5 @@
 package bg.kirilov.timer.ui;
 
-import bg.kirilov.timer.TickingPanel;
-
 import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;

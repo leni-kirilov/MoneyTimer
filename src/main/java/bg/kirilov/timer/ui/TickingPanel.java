@@ -1,4 +1,7 @@
-package bg.kirilov.timer;
+package bg.kirilov.timer.ui;
+
+import bg.kirilov.timer.presenter.CalculatingPerSecondThread;
+import bg.kirilov.timer.presenter.CalculatingPerSecondView;
 
 import javax.swing.*;
 import java.text.NumberFormat;
@@ -16,12 +19,12 @@ import java.text.NumberFormat;
  * wanted by the user. The execution of the clock creates and starts a new thread.<br>
  * <br>
  * All operations are thread-safe since they are never meant to be executed by
- * more than one TickingThread-clock.
+ * more than one CalculatingPerSecondThread-clock.
  *
  * @author Leni Kirilov
  * @version 2010-February
  */
-public class TickingPanel extends javax.swing.JPanel {
+public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSecondView {
 
     /**
      * Used to produce nice formatting of numbers with floating point.<br>
@@ -38,30 +41,22 @@ public class TickingPanel extends javax.swing.JPanel {
     private boolean clockTicking;
     private int numberPeople;
     private double payRate;
-    private TickingThread tickerThread;
+    private CalculatingPerSecondThread tickerThread;
 
-    protected TickingPanel() {
+    public TickingPanel() {
         initComponents();
         pauseButton.setEnabled(false);
     }
 
-    protected JLabel getClockLabel() {
-        return clockLabel;
-    }
-
-    protected int getNumberPeople() {
+    public int getNumberPeople() {
         return numberPeople;
     }
 
-    protected double getPayRate() {
+    public double getPayRate() {
         return payRate;
     }
 
-    protected JLabel getAmountLabel() {
-        return amountLabel;
-    }
-
-    protected NumberFormat getFormatter() {
+    public NumberFormat getFormatter() {
         return formatter;
     }
 
@@ -75,7 +70,7 @@ public class TickingPanel extends javax.swing.JPanel {
     private void startClock() {
         clockTicking = true;
         pauseButton.setEnabled(true);
-        tickerThread = new TickingThread(this);
+        tickerThread = new CalculatingPerSecondThread(this);
         startButton.setText("STOP");
         tickerThread.start();
     }
@@ -426,5 +421,14 @@ public class TickingPanel extends javax.swing.JPanel {
     private javax.swing.JTextField payRateTextField;
     private javax.swing.JButton startButton;
     private JLabel timerNameLabel;
-    // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void setClock(String formattedTimer) {
+        clockLabel.setText(formattedTimer);
+    }
+
+    @Override
+    public void setAmount(String formattedAmount) {
+        amountLabel.setText(formattedAmount);
+    }
 }

@@ -1,6 +1,11 @@
-package bg.kirilov.timer;
+package bg.kirilov.timer.presenter;
 
-import javax.swing.*;
+import bg.kirilov.timer.calculator.MoneyPerSecondCalculator;
+import bg.kirilov.timer.ui.TickingPanel;
+import org.joda.time.Duration;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
+
 import java.text.NumberFormat;
 
 /**
@@ -13,14 +18,13 @@ import java.text.NumberFormat;
  * @author Leni Kirilov
  * @version 2010-February
  */
-//TODO to make it TickingCalculating thread
 //TODO split this class into 2 - 1 for ticking and another one for updating UI when ticks are applied
-public class TickingThread extends Thread {
+public class CalculatingPerSecondThread extends Thread {
 
-    private static final int SECONDS_IN_A_MINUTE = 60;
-    private static final int MINUTES_IN_AN_HOUR = 60;
-    private static final int SECONDS_IN_AN_HOUR = SECONDS_IN_A_MINUTE * MINUTES_IN_AN_HOUR;
+    private static final int ONE_SECOND_IN_MILLIS = 1000;
 
+    //used to calculate the amount
+    private final MoneyPerSecondCalculator calculator;
     /**
      * Defines whether the thread should finish its lifecycle!
      */
@@ -36,19 +40,11 @@ public class TickingThread extends Thread {
     /**
      * Counts the seconds that have passed in actual running.
      */
-    private int currentSeconds;
+    private Duration duration;
     /**
-     * Here it's displayed the total time passed in a suitable format.
+     * The view which is going to be updated per second
      */
-    private JLabel clockLabel;
-    /**
-     * Here it's displayed the total amount to pay for the session in a suitable format.
-     */
-    private JLabel amountLabel;
-    /**
-     * The multiplication of numberOfPeople by payRate.
-     */
-    private double peoplePay;
+    private CalculatingPerSecondView tickingView;
     /**
      * The amount to be displayed is stored here.
      */
@@ -57,18 +53,30 @@ public class TickingThread extends Thread {
      * The formatter of the panel is used to display the data.
      */
     private NumberFormat formatter;
-    /**
-     * Used to concatenate strings faster.
-     */
-    private StringBuilder stringBuilder = new StringBuilder(1);
 
-    protected TickingThread(TickingPanel panel) {
-        //TODO remove direct connection with JLabels. Define a new interface and push Strings to it.
-        this.clockLabel = panel.getClockLabel();
-        this.amountLabel = panel.getAmountLabel();
+    public static PeriodFormatter timerFormatter;
+
+    static {
+        timerFormatter = new PeriodFormatterBuilder()
+                .printZeroAlways()
+                .minimumPrintedDigits(2)
+                .appendHours()
+                .appendSeparator(":")
+                .printZeroAlways()
+                .minimumPrintedDigits(2)
+                .appendMinutes()
+                .appendSeparator(":")
+                .printZeroAlways()
+                .minimumPrintedDigits(2)
+                .appendSeconds()
+                .toFormatter();
+    }
+
+    public CalculatingPerSecondThread(TickingPanel panel) {
+        this.duration = new Duration(0L);
+        this.tickingView = panel;
         this.formatter = panel.getFormatter();
-
-        this.peoplePay = panel.getNumberPeople() * panel.getPayRate();
+        this.calculator = new MoneyPerSecondCalculator(panel.getNumberPeople(), panel.getPayRate());
     }
 
     @Override
@@ -99,7 +107,7 @@ public class TickingThread extends Thread {
                     }
                 } else {//updates if running and not paused
                     update();
-                    Thread.sleep(1000);
+                    Thread.sleep(ONE_SECOND_IN_MILLIS);
                 }
             }
 
@@ -115,7 +123,7 @@ public class TickingThread extends Thread {
     /**
      * Stops the current thread.
      */
-    protected void stopThread() {
+    public void stopThread() {
         running = false;
     }
 
@@ -124,7 +132,7 @@ public class TickingThread extends Thread {
      *
      * @return String - formatted accordingly
      */
-    protected String getFinalAmount() {
+    public String getFinalAmount() {
         return formatter.format(amount);
     }
 
@@ -133,14 +141,14 @@ public class TickingThread extends Thread {
      *
      * @return String - formatted accordingly
      */
-    protected String getFinalTime() {
-        return stringBuilder.toString();
+    public String getFinalTime() {
+        return getCurrentTimeFormatted();
     }
 
     /**
      * @return boolean - true if the thread is currently paused
      */
-    protected boolean isPaused() {
+    public boolean isPaused() {
         return paused;
     }
 
@@ -156,7 +164,7 @@ public class TickingThread extends Thread {
      *
      * @param paused - set true if you want to pause the thread
      */
-    protected void setPaused(boolean paused) {
+    public void setPaused(boolean paused) {
         this.paused = paused;
     }
 
@@ -165,57 +173,23 @@ public class TickingThread extends Thread {
      * PRECONDITION - the thread is paused!<br>
      * If thread isn't paused - this will have no effect!
      */
-    protected void dieAtResume() {
+    public void dieAtResume() {
         if (paused) {
             dead = true;
         }
     }
 
-    //
-    //================PRIVATE METHODS=========================
-    //
-
     /**
      * Update 1 second to all data - clock and amount to pay.
      */
     private void update() {
-        currentSeconds++;
-        updateClock();
+        duration = duration.plus(ONE_SECOND_IN_MILLIS);
+        tickingView.setClock(getCurrentTimeFormatted());
         updateAmount();
     }
 
-    /**
-     * Updates the clock
-     */
-    //TODO extract this to a ClockComputing class that forms a string
-    private void updateClock() {
-        int localCurrentSeconds = currentSeconds;
-        int hours = localCurrentSeconds / SECONDS_IN_AN_HOUR;
-        String hourStr = "";
-        if (hours < 10) {
-            hourStr = "0";
-        }
-
-        int minutesAndSeconds = localCurrentSeconds % SECONDS_IN_AN_HOUR;
-        int minutes = minutesAndSeconds / SECONDS_IN_A_MINUTE;
-        String minutesStr = "";
-        if (minutes < 10) {
-            minutesStr = "0";
-        }
-
-        int seconds = minutesAndSeconds % SECONDS_IN_A_MINUTE;
-        String secondsStr = "";
-        if (seconds < 10) {
-            secondsStr = "0";
-        }
-
-        stringBuilder.delete(0, stringBuilder.length());
-
-        stringBuilder
-                .append(hourStr).append(hours).append(":")
-                .append(minutesStr).append(minutes).append(":")
-                .append(secondsStr).append(seconds);
-        clockLabel.setText(stringBuilder.toString());
+    private String getCurrentTimeFormatted() {
+        return timerFormatter.print(duration.toPeriod());
     }
 
     /**
@@ -223,11 +197,23 @@ public class TickingThread extends Thread {
      */
     private void updateAmount() {
         //TODO an lambda  cam be input here and calculate the value
-        amount = peoplePay * currentSeconds / (SECONDS_IN_AN_HOUR * 1.0);
-        String text = formatter.format(amount);
-        if (text.equals("0")) {
-            text = "0.00";
+        amount = calculator.calculate(duration.toStandardSeconds().getSeconds());
+
+        //TODO should this formatter be extracted as well?
+        String amountStr = formatter.format(amount);
+        tickingView.setAmount(amountStr);
+    }
+
+    public static void main(String[] args) {
+
+        Duration duration = new Duration(0L);
+        for (int i = 0; i < 100; i++) {
+            duration = duration.plus(100000L);
+            System.out.print("; all seconds= " + duration.toStandardSeconds().getSeconds());
+            System.out.print("; seconds= " + duration.getStandardSeconds());
+            System.out.println("; all minutes= " + duration.toStandardMinutes().getMinutes());
+
+            System.out.println(timerFormatter.print(duration.toPeriod()));
         }
-        amountLabel.setText(text);
     }
 }

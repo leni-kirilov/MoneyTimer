@@ -1,6 +1,7 @@
 package bg.kirilov.timer;
 
 import bg.kirilov.timer.ui.MoneyTimerExitHandler;
+import bg.kirilov.timer.ui.TickingPanel;
 
 import javax.swing.*;
 import java.util.Locale;
