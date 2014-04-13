@@ -78,7 +78,6 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      */
     private void pauseClock() {
         tickerThread.setPaused(true);
-        clockTicking = false;
         pauseButton.setText("RESUME");
     }
 
@@ -362,6 +361,7 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      *
      * @param evt
      */
+    //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         if (clockTicking) { //if true, the button says STOP
             if (askIfWantToAbort()) {
