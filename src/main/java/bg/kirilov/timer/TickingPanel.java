@@ -1,12 +1,11 @@
 package bg.kirilov.timer;
 
 import javax.swing.*;
-import java.awt.*;
 import java.text.NumberFormat;
 
 /**
  * JPanel that contains a clock that measures the time and calculates
- * the amount that a meeting costs a number of participants due to a 
+ * the amount that a meeting costs a number of participants due to a
  * pay rate per hour. Not connected with any currency.<br>
  * <br>
  * The input is provided in two text fields and it's verified when the START
@@ -14,8 +13,8 @@ import java.text.NumberFormat;
  * reset.<br>
  * <br>
  * TickingPanel contains means to pause the clock and display results page when
- * wanFted by the user. The execution of the clock creates and starts a new thread.<br>
- *<br>
+ * wanted by the user. The execution of the clock creates and starts a new thread.<br>
+ * <br>
  * All operations are thread-safe since they are never meant to be executed by
  * more than one TickingThread-clock.
  *
@@ -25,7 +24,7 @@ import java.text.NumberFormat;
 public class TickingPanel extends javax.swing.JPanel {
 
     /**
-     * Used to produce nice formating of numbers with floating point.<br>
+     * Used to produce nice formatting of numbers with floating point.<br>
      * 2 characters after the floating point.
      */
     private static NumberFormat formatter;
@@ -33,33 +32,17 @@ public class TickingPanel extends javax.swing.JPanel {
     static {
         formatter = NumberFormat.getInstance();
         formatter.setMaximumFractionDigits(2);
+        formatter.setMinimumFractionDigits(2);
     }
-    private boolean clockRunning; //default value is false
+
+    private boolean clockTicking;
     private int numberPeople;
     private double payRate;
     private TickingThread tickerThread;
 
-    //
-    // ========================PROTECTED METHODS=====================
-    //
     protected TickingPanel() {
         initComponents();
         pauseButton.setEnabled(false);
-    }
-
-    /**
-     * Exit method to give option to cancel exit operation.<br>
-     * Can be used in WindowListeners to override default close operation.
-     * @param evt - the event that triggers the close operation
-     */
-    protected void exit(AWTEvent evt) {
-        int result = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to close the program?\n"
-                + (clockRunning ? "No report for the meeting will be generated!" : ""),
-                "Exit ?", JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }
     }
 
     protected JLabel getClockLabel() {
@@ -82,18 +65,15 @@ public class TickingPanel extends javax.swing.JPanel {
         return formatter;
     }
 
-    protected boolean isClockTicking() {
-        return clockRunning;
+    public boolean isClockTicking() {
+        return clockTicking;
     }
 
-    //
-    //PRIVATE METHODS
-    //
     /**
      * Start the clock ticking. Enables the PAUSE button.
      */
     private void startClock() {
-        clockRunning = true;
+        clockTicking = true;
         pauseButton.setEnabled(true);
         tickerThread = new TickingThread(this);
         startButton.setText("STOP");
@@ -104,7 +84,7 @@ public class TickingPanel extends javax.swing.JPanel {
      * Stops the clock. Disables the PAUSE button.
      */
     private void stopClock() {
-        clockRunning = false;
+        clockTicking = false;
         pauseButton.setEnabled(false);
         tickerThread.stopThread();
         startButton.setText("START");
@@ -122,19 +102,18 @@ public class TickingPanel extends javax.swing.JPanel {
      * Resumes clock. Notifies the thread to continue execution.
      */
     private void resumeClock() {
-        tickerThread.setPaused(false);
-        clockRunning = true;
-        synchronized (tickerThread) {
-            tickerThread.notify();
-        }
+        tickerThread.resumeClock();
+        clockTicking = true;
         pauseButton.setText("PAUSE");
     }
 
+    //TODO extract input parsing to another class?
     /**
      * Performs various checks on the input. Checks for integer and floating<br>
      * point numbers and to be positive.<br>
      * Checks input, creates MessageDialog to inform when the input is incorrect.<br>
      * If correct input is entered the corresponding labels will be updated.<br>
+     *
      * @return - true if the input is correct
      */
     private boolean checkInput() {
@@ -144,6 +123,7 @@ public class TickingPanel extends javax.swing.JPanel {
             payRate = Double.parseDouble(payRateTextField.getText());
 
             if (payRate <= 0 || numberPeople <= 0) {
+                //TODO do not use exceptions for program flow!
                 throw new Exception("Positive numbers are required!");
             }
 
@@ -164,6 +144,7 @@ public class TickingPanel extends javax.swing.JPanel {
 
     /**
      * Displays Dialog window to choose from Yes/No if abortion is wanted.
+     *
      * @return true if clicked YES on the dialog
      */
     private boolean askIfWantToAbort() {
@@ -177,6 +158,7 @@ public class TickingPanel extends javax.swing.JPanel {
 
     /**
      * Displays dialog window to choose Yes/No if results are wanted.
+     *
      * @return true if clicked YES on the dialog
      */
     private boolean wantsResults() {
@@ -192,9 +174,10 @@ public class TickingPanel extends javax.swing.JPanel {
      * Gathers and formats information regarding the current session.<br>
      * Information regarding the number of participants; pay rates; <br>
      * time for the session and total sum is displayed.<br>
-     *
+     * <p/>
      * The results are displayed as a message dialog.
      */
+    //TODO extract result page into another class
     private void showResultsPage() {
         StringBuilder result = new StringBuilder("Result of session:\n");
         result.append("--------\n");
@@ -209,20 +192,18 @@ public class TickingPanel extends javax.swing.JPanel {
 
     /**
      * Sets pay rate and synchronizes the internals logics with the UI.
+     *
      * @param payRate - valid double number
      */
     private void setPayRate(double payRate) {
-        if (payRate == 0) {
-            payRateTextField.setText("0.00");
-        } else {
-            String text = getFormatter().format(payRate);
-            payRateTextField.setText(text);
-        }
+        String text = getFormatter().format(payRate);
+        payRateTextField.setText(text);
         this.payRate = payRate;
     }
 
     /**
      * Sets numberOfPeople and synchronizes the internals logics with the UI.
+     *
      * @param number - valid integer number
      */
     private void setNumberPeople(int number) {
@@ -260,7 +241,9 @@ public class TickingPanel extends javax.swing.JPanel {
     }
 
     //TODO rework UI - split to UI and presenter
-    /** This method is called from within the constructor to
+
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -278,7 +261,6 @@ public class TickingPanel extends javax.swing.JPanel {
         pauseButton = new javax.swing.JButton();
         timerNameLabel = new JLabel();
         amountNameLabel = new JLabel();
-        exitButton = new javax.swing.JButton();
         clockLabel = new JLabel();
         amountLabel = new JLabel();
 
@@ -290,6 +272,7 @@ public class TickingPanel extends javax.swing.JPanel {
 
         payRateTextField.setText("0.00");
 
+        //TODO think about split to 2 buttons - start and stop
         startButton.setText("START");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -308,13 +291,6 @@ public class TickingPanel extends javax.swing.JPanel {
 
         amountNameLabel.setText("Amount: ");
 
-        exitButton.setText("EXIT");
-        exitButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitButtonActionPerformed(evt);
-            }
-        });
-
         clockLabel.setText("00:00:00");
 
         amountLabel.setText("0.00");
@@ -322,91 +298,87 @@ public class TickingPanel extends javax.swing.JPanel {
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, mainPanelLayout.createSequentialGroup()
-                                .addGap(23, 23, 23)
+                mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(mainPanelLayout.createSequentialGroup()
-                                        .addComponent(startButton)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
-                                        .addComponent(pauseButton))
-                                    .addGroup(mainPanelLayout.createSequentialGroup()
-                                        .addGap(11, 11, 11)
-                                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(timerNameLabel)
-                                            .addComponent(clockLabel)))))
-                            .addGroup(mainPanelLayout.createSequentialGroup()
-                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(numberParticipantsLabel)
-                                    .addComponent(payRateLabel))
-                                .addGap(18, 18, 18)
-                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, mainPanelLayout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
-                                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addGroup(mainPanelLayout.createSequentialGroup()
-                                                .addGap(10, 10, 10)
-                                                .addComponent(amountLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addComponent(amountNameLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
-                                    .addComponent(payRateTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
-                                    .addComponent(numberParticipantsTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))))
-                        .addGap(24, 24, 24))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
-                        .addComponent(exitButton)
-                        .addGap(116, 116, 116))))
+                                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, mainPanelLayout.createSequentialGroup()
+                                                                .addGap(23, 23, 23)
+                                                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                                                                .addComponent(startButton)
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                                                                                .addComponent(pauseButton))
+                                                                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                                                                .addGap(11, 11, 11)
+                                                                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                        .addComponent(timerNameLabel)
+                                                                                        .addComponent(clockLabel)))))
+                                                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(numberParticipantsLabel)
+                                                                        .addComponent(payRateLabel))
+                                                                .addGap(18, 18, 18)
+                                                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, mainPanelLayout.createSequentialGroup()
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
+                                                                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                                                                                .addGap(10, 10, 10)
+                                                                                                .addComponent(amountLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                                                        .addComponent(amountNameLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
+                                                                        .addComponent(payRateTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                                                                        .addComponent(numberParticipantsTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE))))
+                                                .addGap(24, 24, 24))))
         );
         mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(numberParticipantsLabel)
-                    .addComponent(numberParticipantsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(payRateLabel)
-                    .addComponent(payRateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(startButton)
-                    .addComponent(pauseButton))
-                .addGap(18, 18, 18)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(amountNameLabel)
-                    .addComponent(timerNameLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(amountLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(clockLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exitButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(numberParticipantsLabel)
+                                        .addComponent(numberParticipantsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(payRateLabel)
+                                        .addComponent(payRateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(startButton)
+                                        .addComponent(pauseButton))
+                                .addGap(18, 18, 18)
+                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(amountNameLabel)
+                                        .addComponent(timerNameLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(amountLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(clockLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     /**
      * The actions that are done when the "START/"STOP" button is clicked.<br>
      * They depend on the current state of the clock - PAUSED/RUNNING/STOPPED.
+     *
      * @param evt
      */
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        if (clockRunning) {
+        if (clockTicking) { //if true, the button says STOP
             if (askIfWantToAbort()) {
                 if (tickerThread.isPaused()) {
                     tickerThread.dieAtResume();
@@ -420,41 +392,32 @@ public class TickingPanel extends javax.swing.JPanel {
                 }
                 resetPanel();
             }
-        } else {
+        } else { //if false, the button says START
             if (checkInput()) {
                 disableInput();
                 startClock();
             }
         }
-}//GEN-LAST:event_startButtonActionPerformed
+    }//GEN-LAST:event_startButtonActionPerformed
 
     /**
      * The actions that are done when the "PAUSE"/"RESUME" button is clicked.<br>
      * They depend on the current state of the clock - RUNNING/PAUSED/STOPPED.
+     *
      * @param evt
      */
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
-        if (clockRunning) {
-            if (tickerThread.isPaused()) {
-                resumeClock();
-            } else {
-                pauseClock();
-            }
+        if (tickerThread.isPaused()) {
+            resumeClock();
+        } else {
+            pauseClock();
         }
-}//GEN-LAST:event_pauseButtonActionPerformed
+    }//GEN-LAST:event_pauseButtonActionPerformed
 
-    /**
-     * The actions that are performed when the "EXIT" button is clicked.<br>
-     * @param evt
-     */
-    private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
-        exit(evt);
-}//GEN-LAST:event_exitButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JLabel amountLabel;
     private JLabel amountNameLabel;
     private JLabel clockLabel;
-    private javax.swing.JButton exitButton;
     private javax.swing.JPanel mainPanel;
     private JLabel numberParticipantsLabel;
     private javax.swing.JTextField numberParticipantsTextField;

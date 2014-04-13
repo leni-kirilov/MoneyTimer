@@ -1,8 +1,8 @@
 package bg.kirilov.timer;
 
+import bg.kirilov.timer.ui.MoneyTimerExitHandler;
+
 import javax.swing.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.Locale;
 
 /**
@@ -13,44 +13,24 @@ import java.util.Locale;
  * @author Leni Kirilov
  * @version 2010-February
  */
+
+//TODO write unit tests for calculations
+//TODO set 1.8 JDK and start using 1.8 constructs
 public final class Tester {
 
     public static void main(String[] args) {
         JOptionPane.setDefaultLocale(Locale.ENGLISH);
         JFrame frame = new JFrame();
         final TickingPanel panel = new TickingPanel();
+        final MoneyTimerExitHandler exitHandler = new MoneyTimerExitHandler(panel);//TODO may be change the API of the panel. getExitHandler()
         frame.add(panel);
 
         frame.setTitle("Timer");
         frame.setResizable(false);
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowListener() {
+        frame.addWindowListener(exitHandler);
 
-            public void windowOpened(WindowEvent e) {
-            }
-
-            public void windowClosing(WindowEvent e) {
-                panel.exit(e);
-            }
-
-            public void windowClosed(WindowEvent e) {
-            }
-
-            public void windowIconified(WindowEvent e) {
-            }
-
-            public void windowDeiconified(WindowEvent e) {
-            }
-
-            public void windowActivated(WindowEvent e) {
-            }
-
-            public void windowDeactivated(WindowEvent e) {
-            }
-        });
-
-        //this is a test comment
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

@@ -13,9 +13,13 @@ import java.text.NumberFormat;
  * @author Leni Kirilov
  * @version 2010-February
  */
-
+//TODO to make it TickingCalculating thread
 //TODO split this class into 2 - 1 for ticking and another one for updating UI when ticks are applied
 public class TickingThread extends Thread {
+
+    private static final int SECONDS_IN_A_MINUTE = 60;
+    private static final int MINUTES_IN_AN_HOUR = 60;
+    private static final int SECONDS_IN_AN_HOUR = SECONDS_IN_A_MINUTE * MINUTES_IN_AN_HOUR;
 
     /**
      * Defines whether the thread should finish its lifecycle!
@@ -59,6 +63,7 @@ public class TickingThread extends Thread {
     private StringBuilder stringBuilder = new StringBuilder(1);
 
     protected TickingThread(TickingPanel panel) {
+        //TODO remove direct connection with JLabels. Define a new interface and push Strings to it.
         this.clockLabel = panel.getClockLabel();
         this.amountLabel = panel.getAmountLabel();
         this.formatter = panel.getFormatter();
@@ -73,7 +78,7 @@ public class TickingThread extends Thread {
     }
 
     /**
-     * Simmulates the work of an actual clock. Can be paused, resumed and stopped.
+     * Simulates the work of an actual clock. Can be paused, resumed and stopped.
      */
     @Override
     @SuppressWarnings("SleepWhileHoldingLock")
@@ -106,6 +111,7 @@ public class TickingThread extends Thread {
     //
     // =========================== PROTECTED METHODS =========================
     //
+
     /**
      * Stops the current thread.
      */
@@ -115,6 +121,7 @@ public class TickingThread extends Thread {
 
     /**
      * Returns the final amount to be payed for the sessions.
+     *
      * @return String - formatted accordingly
      */
     protected String getFinalAmount() {
@@ -123,6 +130,7 @@ public class TickingThread extends Thread {
 
     /**
      * Returns the final total duration of the session.
+     *
      * @return String - formatted accordingly
      */
     protected String getFinalTime() {
@@ -130,11 +138,17 @@ public class TickingThread extends Thread {
     }
 
     /**
-     *
      * @return boolean - true if the thread is currently paused
      */
     protected boolean isPaused() {
         return paused;
+    }
+
+    public void resumeClock() {
+        setPaused(false);
+        synchronized (this) {
+            notify();
+        }
     }
 
     /**
@@ -160,6 +174,7 @@ public class TickingThread extends Thread {
     //
     //================PRIVATE METHODS=========================
     //
+
     /**
      * Update 1 second to all data - clock and amount to pay.
      */
@@ -169,27 +184,26 @@ public class TickingThread extends Thread {
         updateAmount();
     }
 
-    //TODO extract computed values from magic numbers
     /**
      * Updates the clock
      */
+    //TODO extract this to a ClockComputing class that forms a string
     private void updateClock() {
-        int temp = currentSeconds;
-
-        int hours = temp / (60 * 60);
+        int localCurrentSeconds = currentSeconds;
+        int hours = localCurrentSeconds / SECONDS_IN_AN_HOUR;
         String hourStr = "";
         if (hours < 10) {
             hourStr = "0";
         }
 
-        temp = currentSeconds % (60 * 60);
-        int minutes = temp / 60;
+        int minutesAndSeconds = localCurrentSeconds % SECONDS_IN_AN_HOUR;
+        int minutes = minutesAndSeconds / SECONDS_IN_A_MINUTE;
         String minutesStr = "";
         if (minutes < 10) {
             minutesStr = "0";
         }
 
-        int seconds = temp % 60;
+        int seconds = minutesAndSeconds % SECONDS_IN_A_MINUTE;
         String secondsStr = "";
         if (seconds < 10) {
             secondsStr = "0";
@@ -197,9 +211,10 @@ public class TickingThread extends Thread {
 
         stringBuilder.delete(0, stringBuilder.length());
 
-        stringBuilder.append(hourStr).append(hours).append(":");
-        stringBuilder.append(minutesStr).append(minutes).append(":");
-        stringBuilder.append(secondsStr).append(seconds);
+        stringBuilder
+                .append(hourStr).append(hours).append(":")
+                .append(minutesStr).append(minutes).append(":")
+                .append(secondsStr).append(seconds);
         clockLabel.setText(stringBuilder.toString());
     }
 
@@ -207,7 +222,8 @@ public class TickingThread extends Thread {
      * Updates the amount
      */
     private void updateAmount() {
-        amount = peoplePay * currentSeconds / (60 * 60.0);
+        //TODO an lambda  cam be input here and calculate the value
+        amount = peoplePay * currentSeconds / (SECONDS_IN_AN_HOUR * 1.0);
         String text = formatter.format(amount);
         if (text.equals("0")) {
             text = "0.00";
