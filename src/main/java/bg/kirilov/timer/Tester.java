@@ -23,7 +23,8 @@ public final class Tester {
         JOptionPane.setDefaultLocale(Locale.ENGLISH);
         JFrame frame = new JFrame();
         final TickingPanel panel = new TickingPanel();
-        final MoneyTimerExitHandler exitHandler = new MoneyTimerExitHandler(panel);//TODO may be change the API of the panel. getExitHandler()
+        //TODO may be change the API of the panel. getExitHandler()
+        final MoneyTimerExitHandler exitHandler = new MoneyTimerExitHandler(panel);
         frame.add(panel);
 
         frame.setTitle("Timer");

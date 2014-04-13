@@ -1,10 +1,11 @@
 package bg.kirilov.timer.ui;
 
+import bg.kirilov.timer.calculator.MoneyPerSecondCalculator;
 import bg.kirilov.timer.presenter.CalculatingPerSecondThread;
 import bg.kirilov.timer.presenter.CalculatingPerSecondView;
+import bg.kirilov.timer.presenter.Formatters;
 
 import javax.swing.*;
-import java.text.NumberFormat;
 
 /**
  * JPanel that contains a clock that measures the time and calculates
@@ -26,18 +27,6 @@ import java.text.NumberFormat;
  */
 public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSecondView {
 
-    /**
-     * Used to produce nice formatting of numbers with floating point.<br>
-     * 2 characters after the floating point.
-     */
-    private static NumberFormat formatter;
-
-    static {
-        formatter = NumberFormat.getInstance();
-        formatter.setMaximumFractionDigits(2);
-        formatter.setMinimumFractionDigits(2);
-    }
-
     private boolean clockTicking;
     private int numberPeople;
     private double payRate;
@@ -56,10 +45,6 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
         return payRate;
     }
 
-    public NumberFormat getFormatter() {
-        return formatter;
-    }
-
     public boolean isClockTicking() {
         return clockTicking;
     }
@@ -70,11 +55,14 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
     private void startClock() {
         clockTicking = true;
         pauseButton.setEnabled(true);
-        tickerThread = new CalculatingPerSecondThread(this);
+
+        MoneyPerSecondCalculator calculator = new MoneyPerSecondCalculator(getNumberPeople(), getPayRate());
+        tickerThread = new CalculatingPerSecondThread(this, Formatters.getNumberFormatter(), calculator);
         startButton.setText("STOP");
         tickerThread.start();
     }
 
+    //TODO try to create an ENUM with the states of the panel (in the presenter of course) and try to reduce the boolean variables
     /**
      * Stops the clock. Disables the PAUSE button.
      */
@@ -90,6 +78,7 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      */
     private void pauseClock() {
         tickerThread.setPaused(true);
+        clockTicking = false;
         pauseButton.setText("RESUME");
     }
 
@@ -103,6 +92,7 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
     }
 
     //TODO extract input parsing to another class?
+
     /**
      * Performs various checks on the input. Checks for integer and floating<br>
      * point numbers and to be positive.<br>
@@ -180,7 +170,7 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
         result.append("Pay rate per hour: ").append(payRate).append("\n");
         result.append("--------\n");
         result.append("Total time (HH:MM:ss) : ").append(tickerThread.getFinalTime()).append("\n");
-        result.append("Total cost: ").append(tickerThread.getFinalAmount());
+        result.append("Total cost: ").append(tickerThread.getFinalAmountFormatted());
 
         JOptionPane.showMessageDialog(this, result.toString(), "This is your result", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -191,7 +181,7 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      * @param payRate - valid double number
      */
     private void setPayRate(double payRate) {
-        String text = getFormatter().format(payRate);
+        String text = Formatters.getNumberFormatter().format(payRate);
         payRateTextField.setText(text);
         this.payRate = payRate;
     }

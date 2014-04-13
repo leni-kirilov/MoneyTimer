@@ -1,10 +1,7 @@
 package bg.kirilov.timer.presenter;
 
-import bg.kirilov.timer.calculator.MoneyPerSecondCalculator;
-import bg.kirilov.timer.ui.TickingPanel;
+import bg.kirilov.timer.calculator.Calculator;
 import org.joda.time.Duration;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.text.NumberFormat;
 
@@ -23,8 +20,8 @@ public class CalculatingPerSecondThread extends Thread {
 
     private static final int ONE_SECOND_IN_MILLIS = 1000;
 
-    //used to calculate the amount
-    private final MoneyPerSecondCalculator calculator;
+    //STATE fields
+
     /**
      * Defines whether the thread should finish its lifecycle!
      */
@@ -37,6 +34,13 @@ public class CalculatingPerSecondThread extends Thread {
      * Determines if the run method is still going on.
      */
     private boolean running;
+    /*
+     * The amount to be displayed is stored here.
+     */
+    private double amount;
+
+    //HELPER fields
+
     /**
      * Counts the seconds that have passed in actual running.
      */
@@ -45,38 +49,20 @@ public class CalculatingPerSecondThread extends Thread {
      * The view which is going to be updated per second
      */
     private CalculatingPerSecondView tickingView;
-    /**
-     * The amount to be displayed is stored here.
+    /*
+     * used to calculate the amount
      */
-    private double amount;
+    private final Calculator calculator;
     /**
      * The formatter of the panel is used to display the data.
      */
     private NumberFormat formatter;
 
-    public static PeriodFormatter timerFormatter;
-
-    static {
-        timerFormatter = new PeriodFormatterBuilder()
-                .printZeroAlways()
-                .minimumPrintedDigits(2)
-                .appendHours()
-                .appendSeparator(":")
-                .printZeroAlways()
-                .minimumPrintedDigits(2)
-                .appendMinutes()
-                .appendSeparator(":")
-                .printZeroAlways()
-                .minimumPrintedDigits(2)
-                .appendSeconds()
-                .toFormatter();
-    }
-
-    public CalculatingPerSecondThread(TickingPanel panel) {
+    public CalculatingPerSecondThread(CalculatingPerSecondView view, NumberFormat formatter, Calculator calculator) {
         this.duration = new Duration(0L);
-        this.tickingView = panel;
-        this.formatter = panel.getFormatter();
-        this.calculator = new MoneyPerSecondCalculator(panel.getNumberPeople(), panel.getPayRate());
+        this.tickingView = view;
+        this.formatter = formatter;
+        this.calculator = calculator;
     }
 
     @Override
@@ -116,10 +102,6 @@ public class CalculatingPerSecondThread extends Thread {
         }
     }
 
-    //
-    // =========================== PROTECTED METHODS =========================
-    //
-
     /**
      * Stops the current thread.
      */
@@ -132,7 +114,7 @@ public class CalculatingPerSecondThread extends Thread {
      *
      * @return String - formatted accordingly
      */
-    public String getFinalAmount() {
+    public String getFinalAmountFormatted() {
         return formatter.format(amount);
     }
 
@@ -189,7 +171,7 @@ public class CalculatingPerSecondThread extends Thread {
     }
 
     private String getCurrentTimeFormatted() {
-        return timerFormatter.print(duration.toPeriod());
+        return Formatters.getPeriodFormatter().print(duration.toPeriod());
     }
 
     /**
@@ -198,22 +180,6 @@ public class CalculatingPerSecondThread extends Thread {
     private void updateAmount() {
         //TODO an lambda  cam be input here and calculate the value
         amount = calculator.calculate(duration.toStandardSeconds().getSeconds());
-
-        //TODO should this formatter be extracted as well?
-        String amountStr = formatter.format(amount);
-        tickingView.setAmount(amountStr);
-    }
-
-    public static void main(String[] args) {
-
-        Duration duration = new Duration(0L);
-        for (int i = 0; i < 100; i++) {
-            duration = duration.plus(100000L);
-            System.out.print("; all seconds= " + duration.toStandardSeconds().getSeconds());
-            System.out.print("; seconds= " + duration.getStandardSeconds());
-            System.out.println("; all minutes= " + duration.toStandardMinutes().getMinutes());
-
-            System.out.println(timerFormatter.print(duration.toPeriod()));
-        }
+        tickingView.setAmount(getFinalAmountFormatted());
     }
 }
