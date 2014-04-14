@@ -10,9 +10,9 @@ import java.awt.event.WindowListener;
  */
 public class MoneyTimerExitHandler implements WindowListener {
 
-    private TickingPanel tickingPanel;
+    private TickingViewImpl tickingPanel;
 
-    public MoneyTimerExitHandler(TickingPanel tickingPanel) {
+    public MoneyTimerExitHandler(TickingViewImpl tickingPanel) {
         this.tickingPanel = tickingPanel;
     }
 
@@ -24,7 +24,7 @@ public class MoneyTimerExitHandler implements WindowListener {
     public void windowClosing(WindowEvent e) {
         int result = JOptionPane.showConfirmDialog(tickingPanel,
                 "Are you sure you want to close the program?\n"
-                        + (tickingPanel.isClockTicking() ? "No report for the meeting will be generated!" : ""),
+                        + (tickingPanel.presenter.isClockTicking() ? "No report for the meeting will be generated!" : ""),
                 "Exit ?", JOptionPane.YES_NO_OPTION
         );
         if (result == JOptionPane.YES_OPTION) {

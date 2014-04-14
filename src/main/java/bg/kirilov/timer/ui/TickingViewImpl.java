@@ -1,9 +1,8 @@
 package bg.kirilov.timer.ui;
 
-import bg.kirilov.timer.calculator.MoneyPerSecondCalculator;
-import bg.kirilov.timer.presenter.CalculatingPerSecondThread;
 import bg.kirilov.timer.presenter.CalculatingPerSecondView;
 import bg.kirilov.timer.presenter.Formatters;
+import bg.kirilov.timer.presenter.TickingPresenter;
 
 import javax.swing.*;
 
@@ -16,7 +15,7 @@ import javax.swing.*;
  * button is clicked. When a session is ended - the data in the text fields is
  * reset.<br>
  * <br>
- * TickingPanel contains means to pause the clock and display results page when
+ * TickingViewImpl contains means to pause the clock and display results page when
  * wanted by the user. The execution of the clock creates and starts a new thread.<br>
  * <br>
  * All operations are thread-safe since they are never meant to be executed by
@@ -25,106 +24,54 @@ import javax.swing.*;
  * @author Leni Kirilov
  * @version 2010-February
  */
-public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSecondView {
+public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPerSecondView, TickingView {
 
-    private boolean clockTicking;
-    private int numberPeople;
-    private double payRate;
-    private CalculatingPerSecondThread tickerThread;
+    //TODO TEMP variable for saver and easier refactoring. Remove when refactoring is done
+    public TickingPresenter presenter;
 
-    public TickingPanel() {
+    public TickingViewImpl() {
         initComponents();
         pauseButton.setEnabled(false);
     }
 
-    public int getNumberPeople() {
-        return numberPeople;
-    }
-
-    public double getPayRate() {
-        return payRate;
-    }
-
-    public boolean isClockTicking() {
-        return clockTicking;
+    public void setPresenter(TickingPresenter presenter) {
+        this.presenter = presenter;
     }
 
     /**
      * Start the clock ticking. Enables the PAUSE button.
      */
-    private void startClock() {
-        clockTicking = true;
+    public void startClock() {
         pauseButton.setEnabled(true);
-
-        MoneyPerSecondCalculator calculator = new MoneyPerSecondCalculator(getNumberPeople(), getPayRate());
-        tickerThread = new CalculatingPerSecondThread(this, Formatters.getNumberFormatter(), calculator);
         startButton.setText("STOP");
-        tickerThread.start();
     }
 
     //TODO try to create an ENUM with the states of the panel (in the presenter of course) and try to reduce the boolean variables
+
     /**
      * Stops the clock. Disables the PAUSE button.
      */
-    private void stopClock() {
-        clockTicking = false;
+    public void stopClock() {
         pauseButton.setEnabled(false);
-        tickerThread.stopThread();
         startButton.setText("START");
     }
 
+    //TODO move javadoc to interface
     /**
      * Pauses the clock(clock thread). Changes the label of the PAUSE button.
      */
-    private void pauseClock() {
-        tickerThread.setPaused(true);
+    public void pauseClock() {
         pauseButton.setText("RESUME");
     }
 
     /**
      * Resumes clock. Notifies the thread to continue execution.
      */
-    private void resumeClock() {
-        tickerThread.resumeClock();
-        clockTicking = true;
+    public void resumeClock() {
         pauseButton.setText("PAUSE");
     }
 
     //TODO extract input parsing to another class?
-
-    /**
-     * Performs various checks on the input. Checks for integer and floating<br>
-     * point numbers and to be positive.<br>
-     * Checks input, creates MessageDialog to inform when the input is incorrect.<br>
-     * If correct input is entered the corresponding labels will be updated.<br>
-     *
-     * @return - true if the input is correct
-     */
-    private boolean checkInput() {
-        boolean correctInput = false;
-        try {
-            numberPeople = Integer.parseInt(numberParticipantsTextField.getText());
-            payRate = Double.parseDouble(payRateTextField.getText());
-
-            if (payRate <= 0 || numberPeople <= 0) {
-                //TODO do not use exceptions for program flow!
-                throw new Exception("Positive numbers are required!");
-            }
-
-            correctInput = true;
-        } catch (Exception exc) {
-            JOptionPane.showMessageDialog(this,
-                    "Incorrect input! Required integer for number of people and float point number for rate.",
-                    exc.getMessage(),
-                    JOptionPane.WARNING_MESSAGE);
-            numberPeople = 0;
-            payRate = 0.0d;
-        }
-
-        setNumberPeople(getNumberPeople());
-        setPayRate(getPayRate());
-        return correctInput;
-    }
 
     /**
      * Displays Dialog window to choose from Yes/No if abortion is wanted.
@@ -145,33 +92,13 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      *
      * @return true if clicked YES on the dialog
      */
-    private boolean wantsResults() {
+    private boolean wantsReport() {
         int result = JOptionPane.showConfirmDialog(this,
-                "Do you want to see results for this session?",
-                "Results ?",
+                "Do you want to see report for this session?",
+                "Report ?",
                 JOptionPane.YES_NO_OPTION);
 
         return (result == JOptionPane.YES_OPTION) ? true : false;
-    }
-
-    /**
-     * Gathers and formats information regarding the current session.<br>
-     * Information regarding the number of participants; pay rates; <br>
-     * time for the session and total sum is displayed.<br>
-     * <p/>
-     * The results are displayed as a message dialog.
-     */
-    //TODO extract result page into another class
-    private void showResultsPage() {
-        StringBuilder result = new StringBuilder("Result of session:\n");
-        result.append("--------\n");
-        result.append("Number of participants: ").append(numberPeople).append("\n");
-        result.append("Pay rate per hour: ").append(payRate).append("\n");
-        result.append("--------\n");
-        result.append("Total time (HH:MM:ss) : ").append(tickerThread.getFinalTime()).append("\n");
-        result.append("Total cost: ").append(tickerThread.getFinalAmountFormatted());
-
-        JOptionPane.showMessageDialog(this, result.toString(), "This is your result", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -179,10 +106,10 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      *
      * @param payRate - valid double number
      */
-    private void setPayRate(double payRate) {
+    @Override
+    public void setPayRate(double payRate) {
         String text = Formatters.getNumberFormatter().format(payRate);
         payRateTextField.setText(text);
-        this.payRate = payRate;
     }
 
     /**
@@ -190,25 +117,19 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      *
      * @param number - valid integer number
      */
-    private void setNumberPeople(int number) {
+    @Override
+    public void setNumberPeople(int number) {
         numberParticipantsTextField.setText(String.valueOf(number));
-        numberPeople = number;
     }
 
     /**
-     * Turns off the input text fields.
+     * Turns on/off the input text fields.
+     *
+     * @param enabled if true, input fields are enabled
      */
-    private void disableInput() {
-        payRateTextField.setEnabled(false);
-        numberParticipantsTextField.setEnabled(false);
-    }
-
-    /**
-     * Turns on the input text fields.
-     */
-    private void enableInput() {
-        payRateTextField.setEnabled(true);
-        numberParticipantsTextField.setEnabled(true);
+    public void setInput(boolean enabled) {
+        payRateTextField.setEnabled(enabled);
+        numberParticipantsTextField.setEnabled(enabled);
     }
 
     /**
@@ -216,15 +137,10 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      * it becomes in the initial state to be used again.<br>
      * Usually used after stopClock().
      */
-    private void resetPanel() {
-        tickerThread = null;
-        setNumberPeople(0);
-        setPayRate(0);
+    public void resetClock() {
         clockLabel.setText("00:00:00");
         amountLabel.setText("0.00");
     }
-
-    //TODO rework UI - split to UI and presenter
 
     /**
      * This method is called from within the constructor to
@@ -267,7 +183,7 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
         pauseButton.setText("PAUSE");
         pauseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pauseButtonActionPerformed(evt);
+                presenter.pauseButtonActionPerformed();
             }
         });
 
@@ -362,44 +278,33 @@ public class TickingPanel extends javax.swing.JPanel implements CalculatingPerSe
      * @param evt
      */
     //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
+    //TODO move to presenter
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        if (clockTicking) { //if true, the button says STOP
+        if (presenter.isClockTicking()) { //if true, the button says STOP
             if (askIfWantToAbort()) {
-                if (tickerThread.isPaused()) {
-                    tickerThread.dieAtResume();
-                    resumeClock();
-                }
+                presenter.resumeIfPaused();
 
-                enableInput();
-                stopClock();
-                if (wantsResults()) {
-                    showResultsPage();
+                setInput(true);
+                presenter.stopClock();
+                if (wantsReport()) {
+                    presenter.showResultsPage(this);
                 }
-                resetPanel();
+                presenter.resetClock();
             }
         } else { //if false, the button says START
-            if (checkInput()) {
-                disableInput();
-                startClock();
+            boolean isInputValid = presenter.validateInput(
+                    numberParticipantsTextField.getText(),
+                    payRateTextField.getText()
+            );
+
+            if (isInputValid) {
+                setInput(false);
+                presenter.startClock();
             }
         }
     }//GEN-LAST:event_startButtonActionPerformed
 
-    /**
-     * The actions that are done when the "PAUSE"/"RESUME" button is clicked.<br>
-     * They depend on the current state of the clock - RUNNING/PAUSED/STOPPED.
-     *
-     * @param evt
-     */
-    private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
-        if (tickerThread.isPaused()) {
-            resumeClock();
-        } else {
-            pauseClock();
-        }
-    }//GEN-LAST:event_pauseButtonActionPerformed
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Vardiables declaration - do not modify//GEN-BEGIN:variables
     private JLabel amountLabel;
     private JLabel amountNameLabel;
     private JLabel clockLabel;
