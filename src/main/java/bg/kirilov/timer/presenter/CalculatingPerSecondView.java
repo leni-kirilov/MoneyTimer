@@ -8,7 +8,7 @@ package bg.kirilov.timer.presenter;
  */
 public interface CalculatingPerSecondView {
 
-    void setClock(String formattedTimer);
+    void setClock(String formattedClock);
 
     void setAmount(String formattedAmount);
 }

@@ -30,13 +30,6 @@ public interface TickingView {
     void showReport(String report);
 
     /**
-     * Turns on/off the input text fields.
-     *
-     * @param enabled if true, input fields are enabled
-     */
-    void setInput(boolean enabled);
-
-    /**
      * The user is asked for input if he wants to abort measuring
      *
      * @return true if the input is YES
@@ -50,6 +43,11 @@ public interface TickingView {
      */
     boolean askIfWantReport();
 
+    /**
+     * Sets pay rate in UI.
+     *
+     * @param payRate - valid double number
+     */
     void setPayRate(double payRate);
 
     /**

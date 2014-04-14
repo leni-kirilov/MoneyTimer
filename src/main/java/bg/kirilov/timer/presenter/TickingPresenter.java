@@ -90,11 +90,9 @@ public class TickingPresenter {
      * time for the session and total sum is displayed.<br>
      * <p/>
      * The results are displayed as a message dialog.
-     *
-     * @param tickingView
      */
     //TODO extract result page into another ReportView class
-    private void showResultsPage(TickingView tickingView) {
+    private String formReport() {
         StringBuilder report = new StringBuilder("Result of session:\n");
         report.append("--------\n")
                 .append("Number of participants: ").append(numberPeople).append("\n")
@@ -103,7 +101,7 @@ public class TickingPresenter {
                 .append("Total time (HH:MM:ss) : ").append(tickerThread.getCurrentTimeFormatted()).append("\n")
                 .append("Total cost: ").append(tickerThread.getFinalAmount());
 
-        tickingView.showReport(report.toString());
+        return report.toString();
     }
 
     /**
@@ -126,14 +124,14 @@ public class TickingPresenter {
      * @param payRateRaw
      */
     //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
-    public void startButtonActionPerformed(String numberParticipantsRaw, String payRateRaw) {//GEN-FIRST:event_startButtonActionPerformed
+    public void startButtonActionPerformed(String numberParticipantsRaw, String payRateRaw) {
         if (isClockTicking()) { //if true, the button says STOP
             if (view.askIfWantToAbort()) {
                 resumeIfPaused();
-                view.setInput(true);
                 stopClock();
                 if (view.askIfWantReport()) {
-                    showResultsPage(view);
+                    String report = formReport();
+                    view.showReport(report);
                 }
                 resetClock();
             }
@@ -141,11 +139,10 @@ public class TickingPresenter {
             boolean isInputValid = validateInput(numberParticipantsRaw, payRateRaw);
 
             if (isInputValid) {
-                view.setInput(false);
                 startClock();
             }
         }
-    }//GEN-LAST:event_startButtonActionPerformed
+    }
 
     /**
      * Performs various checks on the input. Checks for integer and floating<br>
@@ -156,7 +153,7 @@ public class TickingPresenter {
      * @return - true if the input is correct
      */
     //TODO extract input parsing to another class?
-    //TODO single purpose method principle is broken here! - this checks AND shows warning AND updates view! Split to several methods
+    //TODO single responsibility principle is broken here! - this checks AND shows warning AND updates view! Split to several methods
     private boolean validateInput(String peopleCountRaw, String payRateRaw) {
         boolean correctInput = false;
         try {
