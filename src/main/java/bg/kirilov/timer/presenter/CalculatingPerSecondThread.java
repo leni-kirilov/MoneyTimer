@@ -13,7 +13,8 @@ import java.text.NumberFormat;
  * Once a clock is stopped it cannot be reused. The thread has finished its job.
  *
  * @author Leni Kirilov
- * @version 2010-February
+ * @since 2010-February
+ * @version 2014-April
  */
 //TODO split this class into 2 - 1 for ticking and another one for updating UI when ticks are applied
 public class CalculatingPerSecondThread extends Thread {
@@ -114,17 +115,8 @@ public class CalculatingPerSecondThread extends Thread {
      *
      * @return String - formatted accordingly
      */
-    public String getFinalAmountFormatted() {
+    public String getFinalAmount() {
         return formatter.format(amount);
-    }
-
-    /**
-     * Returns the final total duration of the session.
-     *
-     * @return String - formatted accordingly
-     */
-    public String getFinalTime() {
-        return getCurrentTimeFormatted();
     }
 
     /**
@@ -170,8 +162,8 @@ public class CalculatingPerSecondThread extends Thread {
         updateAmount();
     }
 
-    private String getCurrentTimeFormatted() {
-        return Formatters.getPeriodFormatter().print(duration.toPeriod());
+    public String getCurrentTimeFormatted() {
+        return Formaters.getPeriodFormatter().print(duration.toPeriod());
     }
 
     /**
@@ -180,6 +172,6 @@ public class CalculatingPerSecondThread extends Thread {
     private void updateAmount() {
         //TODO an lambda  cam be input here and calculate the value
         amount = calculator.calculate(duration.toStandardSeconds().getSeconds());
-        tickingView.setAmount(getFinalAmountFormatted());
+        tickingView.setAmount(getFinalAmount());
     }
 }

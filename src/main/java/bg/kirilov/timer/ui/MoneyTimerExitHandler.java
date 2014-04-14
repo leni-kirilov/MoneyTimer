@@ -6,7 +6,7 @@ import java.awt.event.WindowListener;
 
 /**
  * @author Leni Kirilov
- * @date 4/13/2014
+ * @since 4/13/2014
  */
 public class MoneyTimerExitHandler implements WindowListener {
 

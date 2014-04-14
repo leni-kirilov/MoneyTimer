@@ -28,7 +28,7 @@ public final class Tester {
         final TickingPresenter presenter = new TickingPresenter(view);
         view.setPresenter(presenter);
 
-        //TODO may be change the API of the panel. getExitHandler()
+        //TODO may be change the API of the panel.getExitHandler()
         final MoneyTimerExitHandler exitHandler = new MoneyTimerExitHandler(view);
 
         frame.add(view);

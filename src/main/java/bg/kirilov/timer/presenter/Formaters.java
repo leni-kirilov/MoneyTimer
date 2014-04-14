@@ -10,15 +10,15 @@ import java.text.NumberFormat;
  * Util class for managing stateless String formatters
  *
  * @author Leni Kirilov
- * @date 4/13/2014
+ * @since 4/13/2014
  */
 //TODO write unit tests to insure the wanted effect if a change is needed
-public class Formatters {
+public class Formaters {
 
     private static NumberFormat formatter;
     private static PeriodFormatter periodFormatter;
 
-    private Formatters() {
+    private Formaters() {
     }
 
     /**

@@ -4,7 +4,7 @@ package bg.kirilov.timer.calculator;
  * Calculator class which calculates secondsPassed * moneyRate
  *
  * @author Leni Kirilov
- * @date 4/13/2014
+ * @since 4/13/2014
  */
 public class MoneyPerSecondCalculator implements Calculator {
 

@@ -1,7 +1,7 @@
 package bg.kirilov.timer.ui;
 
 import bg.kirilov.timer.presenter.CalculatingPerSecondView;
-import bg.kirilov.timer.presenter.Formatters;
+import bg.kirilov.timer.presenter.Formaters;
 import bg.kirilov.timer.presenter.TickingPresenter;
 
 import javax.swing.*;
@@ -22,7 +22,8 @@ import javax.swing.*;
  * more than one CalculatingPerSecondThread-clock.
  *
  * @author Leni Kirilov
- * @version 2010-February
+ * @version 2014.04
+ * @since 2010-February
  */
 public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPerSecondView, TickingView {
 
@@ -38,9 +39,6 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
         this.presenter = presenter;
     }
 
-    /**
-     * Start the clock ticking. Enables the PAUSE button.
-     */
     public void startClock() {
         pauseButton.setEnabled(true);
         startButton.setText("STOP");
@@ -48,56 +46,29 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
 
     //TODO try to create an ENUM with the states of the panel (in the presenter of course) and try to reduce the boolean variables
 
-    /**
-     * Stops the clock. Disables the PAUSE button.
-     */
     public void stopClock() {
         pauseButton.setEnabled(false);
         startButton.setText("START");
     }
 
-    //TODO move javadoc to interface
-    /**
-     * Pauses the clock(clock thread). Changes the label of the PAUSE button.
-     */
     public void pauseClock() {
         pauseButton.setText("RESUME");
     }
 
-    /**
-     * Resumes clock. Notifies the thread to continue execution.
-     */
     public void resumeClock() {
         pauseButton.setText("PAUSE");
     }
 
-    //TODO extract input parsing to another class?
-
-    /**
-     * Displays Dialog window to choose from Yes/No if abortion is wanted.
-     *
-     * @return true if clicked YES on the dialog
-     */
-    private boolean askIfWantToAbort() {
-        int result = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to abort the current counting?",
-                "Abort ?",
-                JOptionPane.YES_NO_OPTION);
-
-        return (result == JOptionPane.YES_OPTION) ? true : false;
+    public boolean askIfWantToAbort() {
+        return ask("Are you sure you want to abort the current counting?", "Abort ?");
     }
 
-    /**
-     * Displays dialog window to choose Yes/No if results are wanted.
-     *
-     * @return true if clicked YES on the dialog
-     */
-    private boolean wantsReport() {
-        int result = JOptionPane.showConfirmDialog(this,
-                "Do you want to see report for this session?",
-                "Report ?",
-                JOptionPane.YES_NO_OPTION);
+    public boolean askIfWantReport() {
+        return ask("Do you want to see report for this session?", "Report ?");
+    }
 
+    private boolean ask(String msg, String title) {
+        int result = JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
         return (result == JOptionPane.YES_OPTION) ? true : false;
     }
 
@@ -108,38 +79,27 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
      */
     @Override
     public void setPayRate(double payRate) {
-        String text = Formatters.getNumberFormatter().format(payRate);
+        String text = Formaters.getNumberFormatter().format(payRate);
         payRateTextField.setText(text);
     }
 
-    /**
-     * Sets numberOfPeople and synchronizes the internals logics with the UI.
-     *
-     * @param number - valid integer number
-     */
-    @Override
     public void setNumberPeople(int number) {
         numberParticipantsTextField.setText(String.valueOf(number));
     }
 
-    /**
-     * Turns on/off the input text fields.
-     *
-     * @param enabled if true, input fields are enabled
-     */
     public void setInput(boolean enabled) {
         payRateTextField.setEnabled(enabled);
         numberParticipantsTextField.setEnabled(enabled);
     }
 
-    /**
-     * Resets the state of the panel internal logics and UI elements, so that<br>
-     * it becomes in the initial state to be used again.<br>
-     * Usually used after stopClock().
-     */
     public void resetClock() {
         clockLabel.setText("00:00:00");
         amountLabel.setText("0.00");
+    }
+
+    @Override
+    public void showReport(String report) {
+        JOptionPane.showMessageDialog(this, report, "This is your result", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -176,7 +136,10 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
         startButton.setText("START");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startButtonActionPerformed(evt);
+                presenter.startButtonActionPerformed(
+                        numberParticipantsTextField.getText(),
+                        payRateTextField.getText()
+                );
             }
         });
 
@@ -271,40 +234,7 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * The actions that are done when the "START/"STOP" button is clicked.<br>
-     * They depend on the current state of the clock - PAUSED/RUNNING/STOPPED.
-     *
-     * @param evt
-     */
-    //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
-    //TODO move to presenter
-    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        if (presenter.isClockTicking()) { //if true, the button says STOP
-            if (askIfWantToAbort()) {
-                presenter.resumeIfPaused();
-
-                setInput(true);
-                presenter.stopClock();
-                if (wantsReport()) {
-                    presenter.showResultsPage(this);
-                }
-                presenter.resetClock();
-            }
-        } else { //if false, the button says START
-            boolean isInputValid = presenter.validateInput(
-                    numberParticipantsTextField.getText(),
-                    payRateTextField.getText()
-            );
-
-            if (isInputValid) {
-                setInput(false);
-                presenter.startClock();
-            }
-        }
-    }//GEN-LAST:event_startButtonActionPerformed
-
-    // Vardiables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private JLabel amountLabel;
     private JLabel amountNameLabel;
     private JLabel clockLabel;

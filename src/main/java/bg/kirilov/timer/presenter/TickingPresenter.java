@@ -25,12 +25,16 @@ public class TickingPresenter {
         this.view = view;
     }
 
-    public void startClock() {
+    public boolean isClockTicking() {
+        return clockTicking;
+    }
+
+    private void startClock() {
         clockTicking = true;
         MoneyPerSecondCalculator calculator = new MoneyPerSecondCalculator(numberPeople, payRate);
         tickerThread = new CalculatingPerSecondThread(
                 (CalculatingPerSecondView) view,
-                Formatters.getNumberFormatter(),
+                Formaters.getNumberFormatter(),
                 calculator);
         tickerThread.start();
 
@@ -38,11 +42,7 @@ public class TickingPresenter {
         view.startClock();
     }
 
-    public boolean isClockTicking() {
-        return clockTicking;
-    }
-
-    public void stopClock() {
+    private void stopClock() {
         clockTicking = false;
         tickerThread.stopThread();
 
@@ -50,7 +50,7 @@ public class TickingPresenter {
         view.stopClock();
     }
 
-    public void resumeClock() {
+    private void resumeClock() {
         clockTicking = true;
         tickerThread.resumeClock();
 
@@ -58,19 +58,24 @@ public class TickingPresenter {
         view.resumeClock();
     }
 
-    public void resumeIfPaused() {
+    private void resumeIfPaused() {
         if (tickerThread.isPaused()) {
             tickerThread.dieAtResume();
             resumeClock();
         }
     }
 
-    public void pauseClock() {
+    private void pauseClock() {
         tickerThread.setPaused(true);
         view.pauseClock();
     }
 
-    public void resetClock() {
+    /**
+     * Resets the internal state of both the presenter and the view <br>
+     * Usually used after stopClock().
+     */
+
+    private void resetClock() {
         tickerThread = null;
         numberPeople = 0;
         payRate = 0.0;
@@ -89,16 +94,16 @@ public class TickingPresenter {
      * @param tickingView
      */
     //TODO extract result page into another ReportView class
-    public void showResultsPage(TickingViewImpl tickingView) {
-        StringBuilder result = new StringBuilder("Result of session:\n");
-        result.append("--------\n")
+    private void showResultsPage(TickingView tickingView) {
+        StringBuilder report = new StringBuilder("Result of session:\n");
+        report.append("--------\n")
                 .append("Number of participants: ").append(numberPeople).append("\n")
                 .append("Pay rate per hour: ").append(payRate).append("\n")
                 .append("--------\n")
-                .append("Total time (HH:MM:ss) : ").append(tickerThread.getFinalTime()).append("\n")
-                .append("Total cost: ").append(tickerThread.getFinalAmountFormatted());
+                .append("Total time (HH:MM:ss) : ").append(tickerThread.getCurrentTimeFormatted()).append("\n")
+                .append("Total cost: ").append(tickerThread.getFinalAmount());
 
-        JOptionPane.showMessageDialog(tickingView, result.toString(), "This is your result", JOptionPane.INFORMATION_MESSAGE);
+        tickingView.showReport(report.toString());
     }
 
     /**
@@ -114,6 +119,35 @@ public class TickingPresenter {
     }
 
     /**
+     * The actions that are done when the "START/"STOP" button is clicked.<br>
+     * They depend on the current state of the clock - PAUSED/RUNNING/STOPPED.
+     *
+     * @param numberParticipantsRaw
+     * @param payRateRaw
+     */
+    //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
+    public void startButtonActionPerformed(String numberParticipantsRaw, String payRateRaw) {//GEN-FIRST:event_startButtonActionPerformed
+        if (isClockTicking()) { //if true, the button says STOP
+            if (view.askIfWantToAbort()) {
+                resumeIfPaused();
+                view.setInput(true);
+                stopClock();
+                if (view.askIfWantReport()) {
+                    showResultsPage(view);
+                }
+                resetClock();
+            }
+        } else { //if false, the button says START
+            boolean isInputValid = validateInput(numberParticipantsRaw, payRateRaw);
+
+            if (isInputValid) {
+                view.setInput(false);
+                startClock();
+            }
+        }
+    }//GEN-LAST:event_startButtonActionPerformed
+
+    /**
      * Performs various checks on the input. Checks for integer and floating<br>
      * point numbers and to be positive.<br>
      * Checks input, creates MessageDialog to inform when the input is incorrect.<br>
@@ -121,7 +155,9 @@ public class TickingPresenter {
      *
      * @return - true if the input is correct
      */
-    public boolean validateInput(String peopleCountRaw, String payRateRaw) {
+    //TODO extract input parsing to another class?
+    //TODO single purpose method principle is broken here! - this checks AND shows warning AND updates view! Split to several methods
+    private boolean validateInput(String peopleCountRaw, String payRateRaw) {
         boolean correctInput = false;
         try {
             numberPeople = Integer.parseInt(peopleCountRaw);
