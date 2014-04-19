@@ -1,4 +1,4 @@
-package bg.kirilov.timer.calculator;
+package bg.kirilov.timer.util;
 
 /**
  * Common constants in dealing with seconds, minutes and hours

@@ -1,7 +1,8 @@
 package bg.kirilov.timer.presenter;
 
 import bg.kirilov.timer.calculator.Calculator;
-import bg.kirilov.timer.calculator.TimeConstants;
+import bg.kirilov.timer.util.Formatters;
+import bg.kirilov.timer.util.TimeConstants;
 import org.joda.time.Duration;
 
 import java.text.NumberFormat;
@@ -49,7 +50,7 @@ public class CalculatingThread extends Thread {
     /**
      * The view which is going to be updated per second
      */
-    private CalculatingPerSecondView view;
+    private CalculatingView view;
     /*
      * used to calculate the amount
      */
@@ -59,8 +60,8 @@ public class CalculatingThread extends Thread {
      */
     private NumberFormat formatter;
 
-    public CalculatingThread(CalculatingPerSecondView view, NumberFormat formatter, Calculator calculator, long tickingIntervalInMillis) {
-        this.duration = new Duration(0L);
+    public CalculatingThread(CalculatingView view, NumberFormat formatter, Calculator calculator, long tickingIntervalInMillis) {
+        this.duration = new Duration(Duration.ZERO);
         this.view = view;
         this.formatter = formatter;
         this.calculator = calculator;
@@ -73,8 +74,8 @@ public class CalculatingThread extends Thread {
      * @param view
      * @param calculator
      */
-    public CalculatingThread(CalculatingPerSecondView view, Calculator calculator) {
-        this(view, Formaters.getNumberFormatter(), calculator, TimeConstants.ONE_SECOND_IN_MILLIS);
+    public CalculatingThread(CalculatingView view, Calculator calculator) {
+        this(view, Formatters.getNumberFormatter(), calculator, TimeConstants.ONE_SECOND_IN_MILLIS);
     }
 
     /**
@@ -83,8 +84,8 @@ public class CalculatingThread extends Thread {
      * @param view
      * @param calculator
      */
-    public CalculatingThread(CalculatingPerSecondView view, Calculator calculator, long tickingIntervalInMillis) {
-        this(view, Formaters.getNumberFormatter(), calculator, tickingIntervalInMillis);
+    public CalculatingThread(CalculatingView view, Calculator calculator, long tickingIntervalInMillis) {
+        this(view, Formatters.getNumberFormatter(), calculator, tickingIntervalInMillis);
     }
 
     @Override
@@ -165,7 +166,7 @@ public class CalculatingThread extends Thread {
     }
 
     public String getCurrentTimeFormatted() {
-        return Formaters.getPeriodFormatter().print(duration.toPeriod());
+        return Formatters.getPeriodFormatter().print(duration.toPeriod());
     }
 
     /**

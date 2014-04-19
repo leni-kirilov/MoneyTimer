@@ -1,8 +1,8 @@
 package bg.kirilov.timer.ui;
 
-import bg.kirilov.timer.presenter.CalculatingPerSecondView;
-import bg.kirilov.timer.presenter.Formaters;
+import bg.kirilov.timer.presenter.CalculatingView;
 import bg.kirilov.timer.presenter.TickingPresenter;
+import bg.kirilov.timer.util.Formatters;
 
 import javax.swing.*;
 
@@ -25,7 +25,7 @@ import javax.swing.*;
  * @version 2014.04
  * @since 2010-February
  */
-public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPerSecondView, TickingView {
+public class TickingViewImpl extends javax.swing.JPanel implements CalculatingView, TickingView {
 
     private JPanel mainPanel;
     private JLabel amountLabel;
@@ -91,7 +91,7 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
     }
 
     public void setPayRate(double payRate) {
-        String text = Formaters.getNumberFormatter().format(payRate);
+        String text = Formatters.getNumberFormatter().format(payRate);
         payRateTextField.setText(text);
     }
 

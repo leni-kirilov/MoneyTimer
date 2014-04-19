@@ -1,5 +1,7 @@
 package bg.kirilov.timer.calculator;
 
+import bg.kirilov.timer.util.TimeConstants;
+
 /**
  * Calculator class which calculates secondsPassed * moneyRate
  *
