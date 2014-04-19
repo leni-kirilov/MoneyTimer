@@ -52,21 +52,14 @@ public class TickingPresenter {
 
     private void resumeClock() {
         clockTicking = true;
-        tickerThread.resumeClock();
+        tickerThread.resumeThread();
 
         //updating view
         view.resumeClock();
     }
 
-    private void resumeIfPaused() {
-        if (tickerThread.isPaused()) {
-            tickerThread.dieAtResume();
-            resumeClock();
-        }
-    }
-
     private void pauseClock() {
-        tickerThread.setPaused(true);
+        tickerThread.pauseThread();
         view.pauseClock();
     }
 
@@ -74,7 +67,6 @@ public class TickingPresenter {
      * Resets the internal state of both the presenter and the view <br>
      * Usually used after stopClock().
      */
-
     private void resetClock() {
         tickerThread = null;
         numberPeople = 0;
@@ -124,18 +116,19 @@ public class TickingPresenter {
      * @param payRateRaw
      */
     //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
-    public void startButtonActionPerformed(String numberParticipantsRaw, String payRateRaw) {
-        if (isClockTicking()) { //if true, the button says STOP
+    public void startStopButtonPressed(String numberParticipantsRaw, String payRateRaw) {
+        if (isClockTicking()) { //if true, the button says STOP. STOPPING the clock
             if (view.askIfWantToAbort()) {
-                resumeIfPaused();
+
                 stopClock();
+
                 if (view.askIfWantReport()) {
                     String report = formReport();
                     view.showReport(report);
                 }
                 resetClock();
             }
-        } else { //if false, the button says START
+        } else { //if false, the button says START , STARTING the clock
             boolean isInputValid = validateInput(numberParticipantsRaw, payRateRaw);
 
             if (isInputValid) {

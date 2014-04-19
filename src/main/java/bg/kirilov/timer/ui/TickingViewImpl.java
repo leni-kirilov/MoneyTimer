@@ -15,7 +15,7 @@ import javax.swing.*;
  * button is clicked. When a session is ended - the data in the text fields is
  * reset.<br>
  * <br>
- * TickingViewImpl contains means to pause the clock and display results page when
+ * TickingViewImpl contains means to pauseThread the clock and display results page when
  * wanted by the user. The execution of the clock creates and starts a new thread.<br>
  * <br>
  * All operations are thread-safe since they are never meant to be executed by
@@ -64,6 +64,7 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
     //TODO try to create an ENUM with the states of the panel (in the presenter of course) and try to reduce the boolean variables
 
     public void stopClock() {
+        resumeClock();
         pauseButton.setEnabled(false);
         startButton.setText("START");
     }
@@ -142,11 +143,11 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingPe
 
         payRateTextField.setText("0.00");
 
-        //TODO think about split to 2 buttons - start and stop
+        //TODO think about splitting into 2 buttons - start and stop
         startButton.setText("START");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                presenter.startButtonActionPerformed(
+                presenter.startStopButtonPressed(
                         numberParticipantsTextField.getText(),
                         payRateTextField.getText()
                 );

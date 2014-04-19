@@ -17,6 +17,7 @@ import java.text.NumberFormat;
  * @version 2014-April
  */
 //TODO split this class into 2 - 1 for ticking and another one for updating UI when ticks are applied
+//TODO make this a class implementing Runnable. that way no issue with overriding Thread.class final methods
 public class CalculatingPerSecondThread extends Thread {
 
     private static final int ONE_SECOND_IN_MILLIS = 1000;
@@ -24,11 +25,7 @@ public class CalculatingPerSecondThread extends Thread {
     //STATE fields
 
     /**
-     * Defines whether the thread should finish its lifecycle!
-     */
-    private boolean dead;
-    /**
-     * Determines whether the thread should pause its process.
+     * Determines whether the thread should pauseThread its process.
      */
     private boolean paused;
     /**
@@ -49,7 +46,7 @@ public class CalculatingPerSecondThread extends Thread {
     /**
      * The view which is going to be updated per second
      */
-    private CalculatingPerSecondView tickingView;
+    private CalculatingPerSecondView view;
     /*
      * used to calculate the amount
      */
@@ -61,7 +58,7 @@ public class CalculatingPerSecondThread extends Thread {
 
     public CalculatingPerSecondThread(CalculatingPerSecondView view, NumberFormat formatter, Calculator calculator) {
         this.duration = new Duration(0L);
-        this.tickingView = view;
+        this.view = view;
         this.formatter = formatter;
         this.calculator = calculator;
     }
@@ -88,10 +85,6 @@ public class CalculatingPerSecondThread extends Thread {
                         this.wait();
                     }
 
-                    //paused thread must stop immediately
-                    if (dead) {
-                        break;
-                    }
                 } else {//updates if running and not paused
                     update();
                     Thread.sleep(ONE_SECOND_IN_MILLIS);
@@ -104,9 +97,10 @@ public class CalculatingPerSecondThread extends Thread {
     }
 
     /**
-     * Stops the current thread.
+     * Stops the current thread. Doesn't matter if it's paused or not.
      */
     public void stopThread() {
+        resumeThread();
         running = false;
     }
 
@@ -126,31 +120,15 @@ public class CalculatingPerSecondThread extends Thread {
         return paused;
     }
 
-    public void resumeClock() {
-        setPaused(false);
+    public void resumeThread() {
+        paused = false;
         synchronized (this) {
             notify();
         }
     }
 
-    /**
-     * Sets the paused/resumed state of the thread.
-     *
-     * @param paused - set true if you want to pause the thread
-     */
-    public void setPaused(boolean paused) {
-        this.paused = paused;
-    }
-
-    /**
-     * The execution of the thread will stop when the thread is resumed!<br>
-     * PRECONDITION - the thread is paused!<br>
-     * If thread isn't paused - this will have no effect!
-     */
-    public void dieAtResume() {
-        if (paused) {
-            dead = true;
-        }
+    public void pauseThread() {
+        this.paused = true;
     }
 
     /**
@@ -158,7 +136,7 @@ public class CalculatingPerSecondThread extends Thread {
      */
     private void update() {
         duration = duration.plus(ONE_SECOND_IN_MILLIS);
-        tickingView.setClock(getCurrentTimeFormatted());
+        view.setClock(getCurrentTimeFormatted());
         updateAmount();
     }
 
@@ -172,6 +150,6 @@ public class CalculatingPerSecondThread extends Thread {
     private void updateAmount() {
         //TODO an lambda  cam be input here and calculate the value
         amount = calculator.calculate(duration.toStandardSeconds().getSeconds());
-        tickingView.setAmount(getFinalAmount());
+        view.setAmount(getFinalAmount());
     }
 }
