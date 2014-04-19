@@ -19,7 +19,7 @@ import javax.swing.*;
  * wanted by the user. The execution of the clock creates and starts a new thread.<br>
  * <br>
  * All operations are thread-safe since they are never meant to be executed by
- * more than one CalculatingPerSecondThread-clock.
+ * more than one CalculatingThread-clock.
  *
  * @author Leni Kirilov
  * @version 2014.04

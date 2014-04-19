@@ -17,7 +17,7 @@ public class TickingPresenter {
     private int numberPeople;
     private double payRate;
     private boolean clockTicking;
-    private CalculatingPerSecondThread tickerThread;
+    private CalculatingThread tickerThread;
 
     private TickingView view;
 
@@ -32,10 +32,7 @@ public class TickingPresenter {
     private void startClock() {
         clockTicking = true;
         MoneyPerSecondCalculator calculator = new MoneyPerSecondCalculator(numberPeople, payRate);
-        tickerThread = new CalculatingPerSecondThread(
-                (CalculatingPerSecondView) view,
-                Formaters.getNumberFormatter(),
-                calculator);
+        tickerThread = new CalculatingThread((CalculatingPerSecondView) view, calculator);
         tickerThread.start();
 
         //update view

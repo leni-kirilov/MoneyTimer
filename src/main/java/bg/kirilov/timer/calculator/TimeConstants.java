@@ -8,6 +8,7 @@ package bg.kirilov.timer.calculator;
  */
 public class TimeConstants {
     public static final int SECONDS_IN_A_MINUTE = 60;
-    private static final int MINUTES_IN_AN_HOUR = 60;
+    public static final int ONE_SECOND_IN_MILLIS = 1000;
+    public static final int MINUTES_IN_AN_HOUR = 60;
     public static final int SECONDS_IN_AN_HOUR = SECONDS_IN_A_MINUTE * MINUTES_IN_AN_HOUR;
 }
