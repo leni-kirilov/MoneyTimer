@@ -115,7 +115,6 @@ public class TickingPresenter {
      * @param numberParticipantsRaw
      * @param payRateRaw
      */
-    //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
     public void startStopButtonPressed(String numberParticipantsRaw, String payRateRaw) {
         if (isClockTicking()) { //if true, the button says STOP => STOPPING the clock
             if (view.askIfWantToAbort()) {

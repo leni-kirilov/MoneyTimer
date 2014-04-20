@@ -6,7 +6,7 @@ package bg.kirilov.timer.presenter.validator;
  * If the input can be parsed it will be saved in validNumber field.<br>
  * Otherwise the flag isValid will be false and a "invalidReason" will contain message.
  */
-//TODO write unit tests
+//TODO search for a validation library
 public class InputValidator {
 
     private InputValidity<?> inputValidity;
