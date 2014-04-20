@@ -157,25 +157,19 @@ public class CalculatingThread extends Thread {
     }
 
     /**
-     * Update 1 second to all data - clock and amount to pay.
+     * Update all data after the specified time interval has elapsed - clock and amount to pay.
      */
     private void update() {
         duration = duration.plus(tickingIntervalInMillis);
         view.setClock(getCurrentTimeFormatted());
-        updateAmount();
+
+        //TODO an lambda  cam be input here and calculate the value
+        amount = calculator.calculate(duration.toStandardSeconds().getSeconds());
+        view.setAmount(getFinalAmount());
     }
 
     public String getCurrentTimeFormatted() {
         return Formatters.getPeriodFormatter().print(duration.toPeriod());
-    }
-
-    /**
-     * Updates the amount
-     */
-    private void updateAmount() {
-        //TODO an lambda  cam be input here and calculate the value
-        amount = calculator.calculate(duration.toStandardSeconds().getSeconds());
-        view.setAmount(getFinalAmount());
     }
 
     public long getTickingIntervalInMillis() {

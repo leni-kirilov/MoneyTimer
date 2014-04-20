@@ -148,8 +148,8 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingVi
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 presenter.startStopButtonPressed(
-                        numberParticipantsTextField.getText(),
-                        payRateTextField.getText()
+                        numberParticipantsTextField.getText().trim(),
+                        payRateTextField.getText().trim()
                 );
             }
         });
@@ -243,6 +243,14 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingVi
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+    }
+
+    @Override
+    public void showInvalidInputMessage(String invalidInputMessage) {
+        JOptionPane.showMessageDialog(this,
+                invalidInputMessage,
+                "Incorrect input",
+                JOptionPane.WARNING_MESSAGE);
     }
 
     /**

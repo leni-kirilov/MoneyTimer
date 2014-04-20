@@ -1,10 +1,11 @@
 package bg.kirilov.timer.presenter;
 
 import bg.kirilov.timer.calculator.MoneyPerSecondCalculator;
+import bg.kirilov.timer.presenter.validator.InputValidator;
+import bg.kirilov.timer.presenter.validator.InputValidity;
 import bg.kirilov.timer.ui.TickingView;
-import bg.kirilov.timer.ui.TickingViewImpl;
 
-import javax.swing.*;
+import java.util.function.Consumer;
 
 /**
  * This handles the business logic and inner state of a TickingView
@@ -70,6 +71,8 @@ public class TickingPresenter {
         payRate = 0.0;
 
         //update view
+        view.setNumberPeople(numberPeople);
+        view.setPayRate(payRate);
         view.resetClock();
     }
 
@@ -77,7 +80,7 @@ public class TickingPresenter {
      * Gathers and formats information regarding the current session.<br>
      * Information regarding the number of participants; pay rates; <br>
      * time for the session and total sum is displayed.<br>
-     * <p/>
+     * <p>
      * The results are displayed as a message dialog.
      */
     //TODO extract result page into another ReportView class
@@ -114,7 +117,7 @@ public class TickingPresenter {
      */
     //TODO most tricky method here! carefully should be refactored and being dependant on fewer booleans
     public void startStopButtonPressed(String numberParticipantsRaw, String payRateRaw) {
-        if (isClockTicking()) { //if true, the button says STOP. STOPPING the clock
+        if (isClockTicking()) { //if true, the button says STOP => STOPPING the clock
             if (view.askIfWantToAbort()) {
 
                 stopClock();
@@ -125,10 +128,13 @@ public class TickingPresenter {
                 }
                 resetClock();
             }
-        } else { //if false, the button says START , STARTING the clock
+        } else { //if false, the button says START => STARTING the clock
             boolean isInputValid = validateInput(numberParticipantsRaw, payRateRaw);
 
             if (isInputValid) {
+                //update view
+                view.setNumberPeople(numberPeople);
+                view.setPayRate(payRate);
                 startClock();
             }
         }
@@ -137,37 +143,35 @@ public class TickingPresenter {
     /**
      * Performs various checks on the input. Checks for integer and floating<br>
      * point numbers and to be positive.<br>
-     * Checks input, creates MessageDialog to inform when the input is incorrect.<br>
-     * If correct input is entered the corresponding labels will be updated.<br>
+     * Checks input, calls view to inform when the input is incorrect.<br>
      *
      * @return - true if the input is correct
      */
-    //TODO extract input parsing to another class?
-    //TODO single responsibility principle is broken here! - this checks AND shows warning AND updates view! Split to several methods
     private boolean validateInput(String peopleCountRaw, String payRateRaw) {
-        boolean correctInput = false;
-        try {
-            numberPeople = Integer.parseInt(peopleCountRaw);
-            payRate = Double.parseDouble(payRateRaw);
+        return validateNumber(
+                "People Count",
+                new InputValidator().validateInt(peopleCountRaw),
+                (InputValidity input) -> {
+                    numberPeople = (Integer) input.getValidNumber();
+                }
+        ) && validateNumber(
+                "Pay Rate",
+                new InputValidator().validateDouble(payRateRaw),
+                (InputValidity input) -> {
+                    payRate = (Double) input.getValidNumber();
+                }
+        );
+    }
 
-            if (payRate <= 0 || numberPeople <= 0) {
-                //TODO do not use exceptions for program flow!
-                throw new Exception("Positive numbers are required!");
-            }
+    private boolean validateNumber(String variableName, InputValidator validator, Consumer<InputValidity> saveCorrectInput) {
+        InputValidity<Integer> inputValidity = validator.validatePositiveNumber().getResult();
 
-            correctInput = true;
-        } catch (Exception exc) {
-            //TODO the view should define this dialog
-            JOptionPane.showMessageDialog((TickingViewImpl) view,
-                    "Incorrect input! Required integer for number of people and float point number for rate.",
-                    exc.getMessage(),
-                    JOptionPane.WARNING_MESSAGE);
-            numberPeople = 0;
-            payRate = 0.0d;
+        if (inputValidity.isValid()) {
+            saveCorrectInput.accept(inputValidity);
+        } else {
+            view.showInvalidInputMessage(variableName + " is invalid because: " + inputValidity.getInvalidReason());
         }
 
-        view.setNumberPeople(numberPeople);
-        view.setPayRate(payRate);
-        return correctInput;
+        return inputValidity.isValid();
     }
 }

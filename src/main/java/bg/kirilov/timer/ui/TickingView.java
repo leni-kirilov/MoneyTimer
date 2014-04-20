@@ -56,4 +56,11 @@ public interface TickingView {
      * @param number - valid integer number
      */
     void setNumberPeople(int number);
+
+    /**
+     * Displays message about wrong input to the user
+     *
+     * @param invalidInputMessage
+     */
+    void showInvalidInputMessage(String invalidInputMessage);
 }
