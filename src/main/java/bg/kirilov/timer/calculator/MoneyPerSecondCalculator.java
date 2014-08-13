@@ -21,6 +21,6 @@ public class MoneyPerSecondCalculator implements Calculator {
 
     @Override
     public double calculate(long secondsPassed) {
-        return (peoplePay * secondsPassed) / (TimeConstants.SECONDS_IN_AN_HOUR * 1.0);
+        return (peoplePay * secondsPassed) / (TimeConstants.SECONDS_IN_AN_HOUR);
     }
 }

@@ -15,9 +15,6 @@ import java.util.Locale;
  * @author Leni Kirilov
  * @version 2010-February
  */
-
-//TODO write unit tests for calculations
-//TODO set 1.8 JDK and start using 1.8 constructs
 public final class Tester {
 
     public static void main(String[] args) {
@@ -28,7 +25,7 @@ public final class Tester {
         final TickingPresenter presenter = new TickingPresenter(view);
         view.setPresenter(presenter);
 
-        //TODO may be change the API of the panel.getExitHandler()
+        //TODO change the API of the panel.getExitHandler()
         final MoneyTimerExitHandler exitHandler = new MoneyTimerExitHandler(view);
 
         frame.add(view);

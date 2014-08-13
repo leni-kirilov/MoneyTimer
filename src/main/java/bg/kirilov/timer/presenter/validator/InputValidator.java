@@ -1,5 +1,7 @@
 package bg.kirilov.timer.presenter.validator;
 
+import java.util.function.Function;
+
 /**
  * Generic class for parsing raw input</br>
  * It can be used as a Builder pattern and getting the final validation result at the end.
@@ -10,13 +12,6 @@ package bg.kirilov.timer.presenter.validator;
 public class InputValidator {
 
     private InputValidity<?> inputValidity;
-
-    /**
-     * Lambda function definition for parsing Strings into Numbers
-     */
-    private static interface Parser {
-        public Number parse(String s);
-    }
 
     /**
      * Validates inputString is a valid Integer
@@ -42,11 +37,11 @@ public class InputValidator {
         });
     }
 
-    private InputValidator validate(String rawInput, Parser parser) {
+    private InputValidator validate(String rawInput, Function<String, Number> parser) {
         InputValidity inputValidity = null;
 
         try {
-            inputValidity = new InputValidity(true, "", parser.parse(rawInput));
+            inputValidity = new InputValidity(true, parser.apply(rawInput));
         } catch (Exception e) {
             inputValidity = new InputValidity(false, "Input string is not a valid number", null);
         }
@@ -66,16 +61,18 @@ public class InputValidator {
                 this;
     }
 
+    //TODO in order to be a real builder, validating should stack and display all possible errors, not just the last
+    //TODO if needs to parse Strings, or validate in a stateless way - provide a static method?
     /**
      * Validates the input number is a positive number
      *
      * @return validator for further validation of input
      */
-    public InputValidator validatePositiveNumber(Number n) {
+    InputValidator validatePositiveNumber(Number n) {
         if (n.doubleValue() <= 0) {
             inputValidity = new InputValidity(false, "Positive number expected.", null);
         } else {
-            inputValidity = new InputValidity(true, "", n);
+            inputValidity = new InputValidity(true, n);
         }
         return this;
     }

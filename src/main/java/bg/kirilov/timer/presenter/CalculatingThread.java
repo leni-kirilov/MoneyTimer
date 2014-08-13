@@ -8,19 +8,18 @@ import org.joda.time.Duration;
 import java.text.NumberFormat;
 
 /**
- * A class revealing functionality for starting, stopping, pausing a clock.<br>
+ * A class for starting, stopping, pausing a clock while calculating something.<br>
  * It also counts how many seconds it was ticking. Calculates how much money<br>
  * was spent for the time based on number of participants and pay rate.<br>
  * <br>
  * Once a clock is stopped it cannot be reused. The thread has finished its job.
- * The update time interval is variable
+ * The update time interval is customizable
  *
  * @author Leni Kirilov
  * @version 2014-April
  * @since 2010-February
  */
 //TODO split this class into 2 - 1 for ticking and another one for updating UI when ticks are applied
-//TODO make this a class implementing Runnable. that way no issue with overriding Thread.class final methods
 public class CalculatingThread extends Thread {
 
     /**
@@ -111,7 +110,7 @@ public class CalculatingThread extends Thread {
                     }
 
                 } else {//updates if running and not paused
-                    update();
+                    updateState();
                     Thread.sleep(tickingIntervalInMillis);
                 }
             }
@@ -159,7 +158,7 @@ public class CalculatingThread extends Thread {
     /**
      * Update all data after the specified time interval has elapsed - clock and amount to pay.
      */
-    private void update() {
+    private void updateState() {
         duration = duration.plus(tickingIntervalInMillis);
         view.setClock(getCurrentTimeFormatted());
 

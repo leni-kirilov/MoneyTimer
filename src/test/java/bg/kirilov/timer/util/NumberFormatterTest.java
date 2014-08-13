@@ -8,6 +8,7 @@ import org.junit.runners.Parameterized;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 /**
  * @author Leni Kirilov
@@ -19,13 +20,14 @@ public class NumberFormatterTest {
     private Double inputNumber;
     private String expected;
 
-    private static NumberFormat format = Formatters.getNumberFormatter();
+    private static NumberFormat format = Formatters.getNumberFormatter(Locale.US);
 
     public NumberFormatterTest(Double inputNumber, String expected) {
         this.inputNumber = inputNumber;
         this.expected = expected;
     }
 
+    //TODO fix for locale. Set the US locale and expect correct output
     @Parameterized.Parameters
     public static Collection doubleNumbers() {
         return Arrays.asList(new Object[][]{

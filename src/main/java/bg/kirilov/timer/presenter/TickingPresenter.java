@@ -146,6 +146,7 @@ public class TickingPresenter {
      *
      * @return - true if the input is correct
      */
+    //TODO I'm not sure I like this code. try to clean it up
     private boolean validateInput(String peopleCountRaw, String payRateRaw) {
         return validateNumber(
                 "People Count",

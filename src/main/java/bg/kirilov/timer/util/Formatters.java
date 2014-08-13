@@ -4,6 +4,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * Util class for managing stateless String formatters
@@ -24,8 +25,12 @@ public class Formatters {
      * 2 characters after the floating point.
      */
     public static NumberFormat getNumberFormatter() {
+        return getNumberFormatter(Locale.getDefault());
+    }
+
+    public static NumberFormat getNumberFormatter(Locale locale) {
         if (formatter == null) {
-            formatter = NumberFormat.getInstance();
+            formatter = NumberFormat.getInstance(locale);
             formatter.setMaximumFractionDigits(2);
             formatter.setMinimumFractionDigits(2);
         }

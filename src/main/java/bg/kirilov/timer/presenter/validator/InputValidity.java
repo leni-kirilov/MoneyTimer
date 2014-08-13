@@ -15,6 +15,10 @@ public class InputValidity<T extends Number> {
         this.validNumber = number;
     }
 
+    public InputValidity(boolean isValid, T validNumber) {
+        this(isValid, "", validNumber);
+    }
+
     public boolean isValid() {
         return isValid;
     }

@@ -2,7 +2,7 @@ MONEY TIMER
 
 A desktop application written in Java Swing.
 
-It is designed to calculate money wasted in a meeting / consulatation etc
+It is designed to calculate money wasted in a meeting / consultation etc
 
 Define:
 - money per hour
@@ -13,8 +13,6 @@ The meetings are able to be PAUSED and RESUMED.
 
 At the end of the meeting a REPORT is visualized.
 
-
-
-CONTINUE INTEGRATION
+CONTINUOUS INTEGRATION
 
 Status: [![Build Status](https://drone.io/github.com/leni-kirilov/MoneyTimer/status.png)](https://drone.io/github.com/leni-kirilov/MoneyTimer/latest)
