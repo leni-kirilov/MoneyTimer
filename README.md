@@ -15,4 +15,6 @@ At the end of the meeting a REPORT is visualized.
 
 CONTINUOUS INTEGRATION
 
-Status: [![Build Status](https://drone.io/github.com/leni-kirilov/MoneyTimer/status.png)](https://drone.io/github.com/leni-kirilov/MoneyTimer/latest)
+[![Build Status](https://api.shippable.com/projects/53ec727cdba44355000ba889/badge/master)](https://www.shippable.com/projects/53ec727cdba44355000ba889)
+[![Build Status](https://travis-ci.org/leni-kirilov/MoneyTimer.svg?branch=master)](https://travis-ci.org/leni-kirilov/MoneyTimer)
+[![Build Status](https://drone.io/github.com/leni-kirilov/MoneyTimer/status.png)](https://drone.io/github.com/leni-kirilov/MoneyTimer/latest)
