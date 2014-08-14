@@ -7,5 +7,12 @@ package bg.kirilov.timer.calculator;
  * @since 4/13/2014
  */
 public interface Calculator {
-    double calculate(long arg);
+
+    /**
+     * Calculates pay
+     *
+     * @param hoursPassed
+     * @return
+     */
+    double calculate(long hoursPassed);
 }

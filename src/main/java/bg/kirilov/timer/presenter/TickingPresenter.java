@@ -1,5 +1,6 @@
 package bg.kirilov.timer.presenter;
 
+import bg.kirilov.timer.calculator.Calculator;
 import bg.kirilov.timer.calculator.MoneyPerSecondCalculator;
 import bg.kirilov.timer.presenter.validator.InputValidator;
 import bg.kirilov.timer.presenter.validator.InputValidity;
@@ -19,7 +20,6 @@ public class TickingPresenter {
     private double payRate;
     private boolean clockTicking;
     private CalculatingThread tickerThread;
-
     private TickingView view;
 
     public TickingPresenter(TickingView view) {
@@ -32,7 +32,8 @@ public class TickingPresenter {
 
     private void startClock() {
         clockTicking = true;
-        MoneyPerSecondCalculator calculator = new MoneyPerSecondCalculator(numberPeople, payRate);
+
+        Calculator calculator = new MoneyPerSecondCalculator(numberPeople, payRate);
         tickerThread = new CalculatingThread((CalculatingView) view, calculator);
         tickerThread.start();
 

@@ -53,17 +53,17 @@ public class CalculatingThread extends Thread {
     /*
      * used to calculate the amount
      */
-    private final Calculator calculator;
+    private final Calculator paymentCalculator;
     /**
      * The formatter of the panel is used to display the data.
      */
     private NumberFormat formatter;
 
-    public CalculatingThread(CalculatingView view, NumberFormat formatter, Calculator calculator, long tickingIntervalInMillis) {
+    private CalculatingThread(CalculatingView view, NumberFormat formatter, Calculator paymentCalculator, long tickingIntervalInMillis) {
         this.duration = new Duration(Duration.ZERO);
         this.view = view;
         this.formatter = formatter;
-        this.calculator = calculator;
+        this.paymentCalculator = paymentCalculator;
         this.tickingIntervalInMillis = tickingIntervalInMillis;
     }
 
@@ -71,20 +71,20 @@ public class CalculatingThread extends Thread {
      * Default number formatter and 1-second interval
      *
      * @param view
-     * @param calculator
+     * @param paymentCalculator
      */
-    public CalculatingThread(CalculatingView view, Calculator calculator) {
-        this(view, Formatters.getNumberFormatter(), calculator, TimeConstants.ONE_SECOND_IN_MILLIS);
+    public CalculatingThread(CalculatingView view, Calculator paymentCalculator) {
+        this(view, Formatters.getNumberFormatter(), paymentCalculator, TimeConstants.ONE_SECOND_IN_MILLIS);
     }
 
     /**
      * Default number formatter
      *
      * @param view
-     * @param calculator
+     * @param paymentCalculator
      */
-    public CalculatingThread(CalculatingView view, Calculator calculator, long tickingIntervalInMillis) {
-        this(view, Formatters.getNumberFormatter(), calculator, tickingIntervalInMillis);
+    public CalculatingThread(CalculatingView view, Calculator paymentCalculator, long tickingIntervalInMillis) {
+        this(view, Formatters.getNumberFormatter(), paymentCalculator, tickingIntervalInMillis);
     }
 
     @Override
@@ -162,8 +162,9 @@ public class CalculatingThread extends Thread {
         duration = duration.plus(tickingIntervalInMillis);
         view.setClock(getCurrentTimeFormatted());
 
-        //TODO an lambda  cam be input here and calculate the value
-        amount = calculator.calculate(duration.toStandardSeconds().getSeconds());
+        int passedSeconds = duration.toStandardSeconds().getSeconds();
+        amount = paymentCalculator.calculate(passedSeconds);
+
         view.setAmount(getFinalAmount());
     }
 
