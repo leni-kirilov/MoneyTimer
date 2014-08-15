@@ -171,8 +171,4 @@ public class CalculatingThread extends Thread {
     public String getCurrentTimeFormatted() {
         return Formatters.getPeriodFormatter().print(duration.toPeriod());
     }
-
-    public long getTickingIntervalInMillis() {
-        return tickingIntervalInMillis;
-    }
 }
