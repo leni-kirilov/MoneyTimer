@@ -43,7 +43,7 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingVi
     private JLabel clockLabel;
     private JLabel timerNameLabel;
 
-    //TODO TEMP variable for saver and easier refactoring. Remove when refactoring is done
+    //TODO TEMP variable for safer and easier refactoring. Remove when refactoring is done
     public TickingPresenter presenter;
 
     public TickingViewImpl() {
@@ -105,8 +105,8 @@ public class TickingViewImpl extends javax.swing.JPanel implements CalculatingVi
         setInput(true);
     }
 
-    public void showReport(String report) {
-        JOptionPane.showMessageDialog(this, report, "This is your result", JOptionPane.INFORMATION_MESSAGE);
+    public void showReport(MoneyReport report) {
+        report.show(this);
     }
 
     @Override

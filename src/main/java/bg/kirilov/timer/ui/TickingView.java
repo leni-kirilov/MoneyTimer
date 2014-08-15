@@ -27,7 +27,7 @@ public interface TickingView {
      */
     void resetClock();
 
-    void showReport(String report);
+    void showReport(MoneyReport report);
 
     /**
      * The user is asked for input if he wants to abort measuring

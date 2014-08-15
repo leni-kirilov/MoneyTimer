@@ -4,6 +4,7 @@ import bg.kirilov.timer.calculator.Calculator;
 import bg.kirilov.timer.calculator.MoneyPerSecondCalculator;
 import bg.kirilov.timer.presenter.validator.InputValidator;
 import bg.kirilov.timer.presenter.validator.InputValidity;
+import bg.kirilov.timer.ui.MoneyReport;
 import bg.kirilov.timer.ui.TickingView;
 
 import java.util.function.Consumer;
@@ -82,19 +83,16 @@ public class TickingPresenter {
      * Information regarding the number of participants; pay rates; <br>
      * time for the session and total sum is displayed.<br>
      * <p>
-     * The results are displayed as a message dialog.
+     * The result is a MoneyReport object which can display the report.
      */
-    //TODO extract result page into another ReportView class
-    private String formReport() {
-        StringBuilder report = new StringBuilder("Result of session:\n");
-        report.append("--------\n")
-                .append("Number of participants: ").append(numberPeople).append("\n")
-                .append("Pay rate per hour: ").append(payRate).append("\n")
-                .append("--------\n")
-                .append("Total time (HH:MM:ss) : ").append(tickerThread.getCurrentTimeFormatted()).append("\n")
-                .append("Total cost: ").append(tickerThread.getFinalAmount());
+    private MoneyReport buildReport() {
+        MoneyReport moneyReport = new MoneyReport();
+        moneyReport.buildReport(numberPeople,
+                payRate,
+                tickerThread.getCurrentTimeFormatted(),
+                tickerThread.getFinalAmount());
 
-        return report.toString();
+        return moneyReport;
     }
 
     /**
@@ -123,8 +121,7 @@ public class TickingPresenter {
                 stopClock();
 
                 if (view.askIfWantReport()) {
-                    String report = formReport();
-                    view.showReport(report);
+                    view.showReport(buildReport());
                 }
                 resetClock();
             }

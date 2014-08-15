@@ -8,14 +8,14 @@ import javax.swing.*;
 import java.util.Locale;
 
 /**
- * Tester class that demonstrates easy usage of the TickingViewImpl.
+ * Main class that demonstrates easy usage of the TickingViewImpl.
  * In order to be sure that the closing of the window is wanted,
  * the WindowListener is added with redefined functionality.
  *
  * @author Leni Kirilov
  * @version 2010-February
  */
-public final class Tester {
+public final class Main {
 
     public static void main(String[] args) {
         JOptionPane.setDefaultLocale(Locale.ENGLISH);

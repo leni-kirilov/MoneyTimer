@@ -27,7 +27,6 @@ public class NumberFormatterTest {
         this.expected = expected;
     }
 
-    //TODO fix for locale. Set the US locale and expect correct output
     @Parameterized.Parameters
     public static Collection doubleNumbers() {
         return Arrays.asList(new Object[][]{
