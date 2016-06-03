@@ -1,5 +1,6 @@
-MONEY TIMER
+# MONEY TIMER
 
+## Description
 A desktop application written in Java Swing.
 
 It is designed to calculate money wasted in a meeting / consultation etc
@@ -13,7 +14,27 @@ The meetings are able to be PAUSED and RESUMED.
 
 At the end of the meeting a REPORT is visualized.
 
-CONTINUOUS INTEGRATION
+### DEV ENV SETUP INSTRUCTIONS
+
+1. Pull the code
+2. Import as Maven project
+3. Execute `mvn clean test`
+4. If tests are green you're done!
+
+
+### HOW TO USE
+
+> java -cp moneytimer-1.0.1.jar bg.kirilov.timer.Main
+
+### HOW TO CONTRIBUTE
+
+1. Fork repo
+2. Make changes. If you are looking for ideas, check the [ISSUES](ISSUES) section in Github
+3. Create a Pull Request to the origin repo
+4. Congratulations!
+
+
+## CONTINUOUS INTEGRATION
 
 [![Build Status](https://travis-ci.org/leni-kirilov/MoneyTimer.svg?branch=master)](https://travis-ci.org/leni-kirilov/MoneyTimer)
 [![Build Status](https://drone.io/github.com/leni-kirilov/MoneyTimer/status.png)](https://drone.io/github.com/leni-kirilov/MoneyTimer/latest)
