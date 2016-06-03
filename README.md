@@ -24,7 +24,7 @@ At the end of the meeting a REPORT is visualized.
 
 ### HOW TO USE
 
-> java -cp moneytimer-1.0.1.jar bg.kirilov.timer.Main
+> java -jar moneytimer-1.0.2-jar-with-dependencies.jar
 
 ### HOW TO CONTRIBUTE
 
