@@ -29,7 +29,7 @@ At the end of the meeting a REPORT is visualized.
 ### HOW TO CONTRIBUTE
 
 1. Fork repo
-2. Make changes. If you are looking for ideas, check the [ISSUES](ISSUES) section in Github
+2. Make changes. If you are looking for ideas, check the [ISSUES](https://github.com/leni-kirilov/MoneyTimer/issues) section in Github
 3. Create a Pull Request to the origin repo
 4. Congratulations!
 
