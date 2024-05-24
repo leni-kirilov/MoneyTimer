@@ -28,6 +28,6 @@ public class MoneyReport extends Component {
     }
 
     public void show(Component parent) {
-        JOptionPane.showMessageDialog(parent, getReport(), "This is your repost`", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(parent, getReport(), "This is your report", JOptionPane.INFORMATION_MESSAGE);
     }
 }

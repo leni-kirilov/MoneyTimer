@@ -1,7 +1,8 @@
 # MONEY TIMER
 
 ## Description
-A desktop application written in Java Swing.
+
+A desktop application is written in Java Swing.
 
 It is designed to calculate money wasted in a meeting / consultation etc
 
@@ -10,9 +11,11 @@ Define:
 - number of participants/consultants
 
 The application measures the time with precision seconds.
-The meetings are able to be PAUSED and RESUMED.
+The meetings can be PAUSED and RESUMED.
 
-At the end of the meeting a REPORT is visualized.
+At the end of the meeting, a REPORT is visualized.
+
+![image](https://github.com/leni-kirilov/MoneyTimer/assets/994676/48d5856c-7bfa-4901-bfbc-b3a83c6164b4)
 
 ### DEV ENV SETUP INSTRUCTIONS
 
