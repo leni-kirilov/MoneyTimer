@@ -30,7 +30,7 @@ public class TimerFormatterTest {
 
     @Parameterized.Parameters
     public static Collection doubleNumbers() {
-        String expected1 = "00:00:00";
+        String expected1 = "00:00:01";
         Duration d1 = new Duration(Duration.ZERO);
         d1 = d1.plus(TimeConstants.ONE_SECOND_IN_MILLIS);
 
