@@ -30,8 +30,8 @@ public class TimerFormatterTest {
 
     @Parameterized.Parameters
     public static Collection doubleNumbers() {
-        String expected1 = "00:00:01";
-        Duration d1 = new Duration(0L);
+        String expected1 = "00:00:00";
+        Duration d1 = new Duration(Duration.ZERO);
         d1 = d1.plus(TimeConstants.ONE_SECOND_IN_MILLIS);
 
         String expected2 = "00:05:15";
@@ -40,7 +40,7 @@ public class TimerFormatterTest {
         d2 = d2.plus(TimeConstants.ONE_SECOND_IN_MILLIS * TimeConstants.SECONDS_IN_A_MINUTE * 5);
 
         String expected3 = "15:55:44";
-        Duration d3 = new Duration(0L);
+        Duration d3 = new Duration(Duration.ZERO);
         d3 = d3.plus(TimeConstants.ONE_SECOND_IN_MILLIS * 44);
         d3 = d3.plus(TimeConstants.ONE_SECOND_IN_MILLIS * TimeConstants.SECONDS_IN_A_MINUTE * 55);
         d3 = d3.plus(TimeConstants.ONE_SECOND_IN_MILLIS * TimeConstants.SECONDS_IN_AN_HOUR * 15);
