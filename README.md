@@ -39,9 +39,7 @@ At the end of the meeting, a REPORT is visualized.
 
 ## CONTINUOUS INTEGRATION
 
-[![Build Status](https://travis-ci.org/leni-kirilov/MoneyTimer.svg?branch=master)](https://travis-ci.org/leni-kirilov/MoneyTimer)
-[![Build Status](https://drone.io/github.com/leni-kirilov/MoneyTimer/status.png)](https://drone.io/github.com/leni-kirilov/MoneyTimer/latest)
-[![Coverage Status](https://img.shields.io/coveralls/leni-kirilov/MoneyTimer.svg)](https://coveralls.io/r/leni-kirilov/MoneyTimer?branch=master)
+[![Java CI with Maven](https://github.com/leni-kirilov/MoneyTimer/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/leni-kirilov/MoneyTimer/actions/workflows/maven.yml)
 
 ### Licence
 Copyright 2016 Leni Kirilov
