@@ -58,6 +58,6 @@ public class TimerFormatterTest {
         String result = format.print(inputPeriod);
         Assert.assertEquals(
                 "Expected time (" + inputPeriod + ") should be in the format xx:xx:xx but found [" + result,
-                expectedTime, result);
+                expectedTime, result + ';');
     }
 }
