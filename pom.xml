@@ -6,7 +6,7 @@
 
     <groupId>bg.kirilov.moneytimer</groupId>
     <artifactId>moneytimer</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -85,7 +85,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.1.201405082137</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -93,17 +93,24 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>2.2.0</version>
-                <configuration>
-                    <repoToken>vHB7JYI0eW4UCH9MA2p5rZL7P5YiDD92n</repoToken>
-                </configuration>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.eluder.coveralls</groupId>-->
+            <!--                <artifactId>coveralls-maven-plugin</artifactId>-->
+            <!--                <version>2.2.0</version>-->
+            <!--                <configuration>-->
+            <!--                    <repoToken>vHB7JYI0eW4UCH9MA2p5rZL7P5YiDD92n</repoToken>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 </project>
