@@ -41,6 +41,6 @@ jobs:
         name: Package
         path: staging
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Maven Dependency Tree Dependency Submission
-      uses: advanced-security/maven-dependency-submission-action@v4.0.3
+#    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+#    - name: Maven Dependency Tree Dependency Submission
+#      uses: advanced-security/maven-dependency-submission-action@v4.0.3
