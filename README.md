@@ -28,9 +28,12 @@ At the end of the meeting, a REPORT is visualized.
 ### HOW TO USE
 
 > mvn exec:java
-> or
+
+or
+
 > java -jar moneytimer-1.0.2-jar-with-dependencies.jar
-> after you've build the jar using
+
+after you've build the jar using `mvn package`
 
 ### HOW TO CONTRIBUTE
 
