@@ -28,9 +28,26 @@ At the end of the meeting, a REPORT is visualized.
 ### HOW TO USE
 
 > mvn exec:java
-> or
+
+or
+
 > java -jar moneytimer-1.0.2-jar-with-dependencies.jar
-> after you've build the jar using
+
+after you've build the jar using `mvn package`
+
+### HOW TO BUILD EXE
+
+#### Requirements (windows):
+
+(requires WiX v3 - follow these instructions - https://stackoverflow.com/a/77459463/342003)
+
+1. Run `buildExe.bat`
+2. It will create an OS binary using the built jar with the embedded dependencies
+3. For Windows MoneyTimer.exe
+
+#### Requirements (Linux/OSx):
+
+TODO
 
 ### HOW TO CONTRIBUTE
 
