@@ -1,0 +1,1 @@
+jpackage --name MoneyTimer --input target --main-jar moneytimer-1.1.0.jar --main-class bg.kirilov.timer.Main
