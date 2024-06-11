@@ -33,17 +33,14 @@ or
 
 > java -jar moneytimer-1.0.2-jar-with-dependencies.jar
 
-after you've build the jar using `mvn package`
-
 ### HOW TO BUILD EXE
 
 #### Requirements (windows):
 
-(requires WiX v3 - follow these instructions - https://stackoverflow.com/a/77459463/342003)
-
-1. Run `buildExe.bat`
-2. It will create an OS binary using the built jar with the embedded dependencies
-3. For Windows MoneyTimer.exe
+1. (requires WiX v3 - follow these instructions - https://stackoverflow.com/a/77459463/342003)
+2. Jar with dependencies created using `mvn package`
+3. Run `buildExe.bat`
+4. It will create `MoneyTimer.exe` an OS binary that shouldn't require Java
 
 #### Requirements (Linux/OSx):
 
